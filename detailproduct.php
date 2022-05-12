@@ -1,3 +1,42 @@
+<?php
+session_start();
+include './src/connect.php';
+include './src/control.php';
+include './src/cart.php';
+include './src/product.php';
+
+if (empty($_GET['id']) || !Product::is_exist($_GET['id'])) {
+  header('Location: product.php');
+  exit();
+}
+
+// Bat dau cart
+$result_list_product = Product::select("id={$_GET['id']}");
+$product = mysqli_fetch_assoc($result_list_product);
+$cart = new Cart();
+
+if (isset($_POST['submit_cart'])) {
+  switch ($_POST['action']) {
+    case 'add':
+      $cart->add($_POST['id'], isset($_POST['quantity']) ? $_POST['quantity'] : 1);
+      break;
+    case 'remove':
+      $cart->remove($_POST['id']);
+      break;
+    default:
+      break;
+  }
+  $_SESSION["opencart"] = 1;
+  if (!empty($_SERVER['HTTP_REFERER'])) {
+    header("Location: {$_SERVER['HTTP_REFERER']}", true, 303);
+  }
+  else {
+    header("Location: /", true, 303);
+  }
+}
+// Ket thuc cart
+?>
+
 <html class="no-js" lang="vi">
 
 <head>
@@ -99,8 +138,7 @@
                 <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
               </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle aaaa" href="#" id="navbarDropdown" role="button"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle aaaa" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <p>SẢN PHẨM</p>
                   <i class="fa fa-angle-double-right"></i>
 
@@ -140,9 +178,7 @@
             <form action="search" class="searchform searchform-categoris ultimate-search">
               <div class="wpo-search-inner" style="display:inline">
                 <input type="hidden" name="type" value="product">
-                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off"
-                  class="searchinput input-search search-input" type="text" size="20"
-                  placeholder="Tìm kiếm sản phẩm...">
+                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off" class="searchinput input-search search-input" type="text" size="20" placeholder="Tìm kiếm sản phẩm...">
               </div>
               <button type="submit" class="btn-search btn" id="search-header-btn">
                 <i style="font-weight:bold" class="fas fa-search"></i>
@@ -160,6 +196,7 @@
 
           <button class="uk-offcanvas-close" style="color:#272727" type="button" uk-close></button>
 
+
           <h3 style="font-size: 14px;
                   color: #272727;
                   text-transform: uppercase;
@@ -169,19 +206,27 @@
             <div class="cart-view clearfix">
               <table id="cart-view">
                 <tbody>
-                  <tr class="item_1">
-                    <td class="img"><a href="" title="Nike Air Max 90 Essential &quot;Grape&quot;"><img
-                          src="images/shoes/1.jpg" alt="/products/nike-air-max-90-essential-grape"></a></td>
-                    <td>
-                      <a class="pro-title-view" style="color: #272727" href=""
-                        title="Nike Air Max 90 Essential &quot;Grape&quot;">Nike Air Max 90 Essential "Grape"</a>
-                      <span class="variant">Tím / 36</span>
-                      <span class="pro-quantity-view">1</span>
-                      <span class="pro-price-view">4,800,000₫</span>
-                      <span class="remove_link remove-cart"><a href=""><i style="color: #272727;"
-                            class="fas fa-times"></i></a></span>
-                    </td>
-                  </tr>
+                  <?php
+                  $cart->foreach_product(function ($is_error, $product, $quantity) {
+                    if (!$is_error) {
+                      $totalprice = Product::format_price($product['price'] * $quantity);
+                      echo "<tr class=\"item_1\">
+                        <td class=\"img\"><a href=\"detailproduct.php?id={$product['id']}\" title=\"{$product['name']}\"><img src=\"{$product['imgsrc1']}\" alt=\"{$product['name']}\"></a></td>
+                        <td>
+                          <a class=\"pro-title-view\" style=\"color: #272727\" href=\"javascript:void(0)\" title=\"{$product['name']}\">{$product['name']}</a>
+                          <!-- <span class=\"variant\">Tím / 36</span> -->
+                          <span class=\"pro-quantity-view\">$quantity</span>
+                          <span class=\"pro-price-view\">{$totalprice}₫</span>
+                          <form method='POST'>
+                            <input type=\"hidden\" name=\"action\" value=\"remove\">
+                            <input type=\"hidden\" name=\"id\" value=\"{$product['id']}\">
+                            <span class=\"remove_link remove-cart\"><button style=\"background: none;border: none;\" type=\"submit\" name=\"submit_cart\" value=\"remove\"><i style=\"color: #272727;\" class=\"fas fa-times\"></i></button></span>
+                          </form>
+                          </td>
+                      </tr>";
+                    }
+                  });
+                  ?>
                 </tbody>
               </table>
               <span class="line"></span>
@@ -189,11 +234,11 @@
                 <tbody>
                   <tr>
                     <td class="text-left">TỔNG TIỀN:</td>
-                    <td class="text-right" id="total-view-cart">4,800,000₫</td>
+                    <td class="text-right" id="total-view-cart"><?= Product::format_price($cart->total()) ?></td>
                   </tr>
                   <tr>
                     <td class="distance-td"><a href="" class="linktocart button dark">Xem giỏ hàng</a></td>
-                    <td><a href="" class="linktocheckout button dark">Thanh toán</a></td>
+                    <td><a href="mail.php" class="linktocheckout button dark">Thanh toán</a></td>
                   </tr>
                 </tbody>
               </table>
@@ -204,6 +249,7 @@
           </div>
         </div>
       </div>
+
 
       <div class="icon-ol">
         <a style="color: #272727" href="">
@@ -216,8 +262,7 @@
         <a style="color: #272727" href="#" uk-toggle="target: #offcanvas-flip2">
           <i class="fas fa-shopping-cart"></i>
         </a>
-        <button class="navbar-toggler" type="button" uk-toggle="target: #offcanvas-flip1" data-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" uk-toggle="target: #offcanvas-flip1" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
       </div>
@@ -269,70 +314,23 @@
                     hidden-xs">
                     <div class="product-gallery__thumbs thumb-fix">
 
-                      <div class="product-gallery__thumb  active" id="imgg1">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/1.jpg" data-zoom-image="images/detailproduct/1.jpg">
-                          <img src="images/detailproduct/1.jpg" data-image="images/detailproduct/1.jpg"
-                            alt="Nike Air Max 90 Essential" grape="">
+                      <?php
+                      echo "<div class=\"product-gallery__thumb  active\" id=\"imgg1\">
+                        <a class=\"product-gallery__thumb-placeholder\" href=\"javascript:void(0);\"
+                          data-image=\"{$product['imgsrc1']}\" data-zoom-image=\"{$product['imgsrc1']}\">
+                          <img src=\"{$product['imgsrc1']}\" data-image=\"{$product['imgsrc1']}\"
+                            alt=\"{$product['name']}\" grape=\"\">
                         </a>
                       </div>
-
-                      <div class="product-gallery__thumb " id="imgg2">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/5.jpg" data-zoom-image="images/detailproduct/5.jpg">
-                          <img src="images/detailproduct/5.jpg" data-image="images/detailproduct/5.jpg"
-                            alt="Nike Air Max 90 Essential" grape="">
+                      <div class=\"product-gallery__thumb \" id=\"imgg2\">
+                        <a class=\"product-gallery__thumb-placeholder\" href=\"javascript:void(0);\"
+                          data-image=\"{$product['imgsrc2']}\" data-zoom-image=\"{$product['imgsrc2']}\">
+                          <img src=\"{$product['imgsrc2']}\" data-image=\"{$product['imgsrc2']}\"
+                            alt=\"{$product['name']}\" grape=\"\">
                         </a>
                       </div>
-
-                      <div class="product-gallery__thumb " id="imgg3">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/2.jpg" data-zoom-image="images/detailproduct/2.jpg">
-                          <img src="images/detailproduct/2.jpg" data-image="images/detailproduct/2.jpg"
-                            alt="Nike Air Max 90 Essential" grape="">
-                        </a>
-                      </div>
-
-                      <div class="product-gallery__thumb " id="imgg4">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/4.jpg" data-zoom-image="images/detailproduct/4.jpg">
-                          <img src="images/detailproduct/4.jpg" data-image="images/detailproduct/4.jpg"
-                            alt="Nike Air Max 90 Essential" grape="">
-                        </a>
-                      </div>
-
-                      <div class="product-gallery__thumb " id="imgg5">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/7.jpg" data-zoom-image="images/detailproduct/7.jpg">
-                          <img src="images/detailproduct/7.jpg" data-image="images/detailproduct/7.jpg"
-                            alt="Nike Air Max 90 Essential" grape="">
-                        </a>
-                      </div>
-
-                      <div class="product-gallery__thumb " id="imgg6">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/3.jpg" data-zoom-image="images/detailproduct/3.jpg">
-                          <img src="images/detailproduct/3.jpg" data-image="images/detailproduct/3.jpg"
-                            alt="Nike Air Max 90 Essential" grape="">
-                        </a>
-                      </div>
-
-                      <div class="product-gallery__thumb " id="imgg7">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/8.jpg" data-zoom-image="images/detailproduct/8.jpg">
-                          <img src="images/detailproduct/8.jpg" data-image="images/detailproduct/8.jpg" alt="Nike
-                            Air Max 90 Essential" grape="">
-                        </a>
-                      </div>
-
-                      <div class="product-gallery__thumb " id="imgg8">
-                        <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                          data-image="images/detailproduct/6.jpg" data-zoom-image="images/detailproduct/6.jpg">
-                          <img src="images/detailproduct/6.jpg" data-image="images/detailproduct/6.jpg"
-                            alt="Nike Air Max 90 Essential" grape="">
-                        </a>
-                      </div>
-
+                      ";
+                      ?>
                     </div>
                   </div>
                   <div class="product-image-detail box__product-gallery
@@ -340,54 +338,25 @@
                     <ul id="sliderproduct" class="site-box-content
                       slide_product">
 
-                      <li class="product-gallery-item gallery-item
-                        current " id="imgg1a">
-                        <img class="product-image-feature " src="images/detailproduct/1.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
-                      <li class="product-gallery-item gallery-item " id="imgg2a">
-                        <img class="product-image-feature" src="images/detailproduct/5.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
-                      <li class="product-gallery-item gallery-item " id="imgg3a">
-                        <img class="product-image-feature" src="images/detailproduct/2.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
-                      <li class="product-gallery-item gallery-ite " id="imgg4a">
-                        <img class="product-image-feature" src="images/detailproduct/4.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
-                      <li class="product-gallery-item gallery-item " id="imgg5a">
-                        <img class="product-image-feature" src="images/detailproduct/7.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
-                      <li class="product-gallery-item gallery-item " id="imgg6a">
-                        <img class="product-image-feature" src="images/detailproduct/3.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
-                      <li class="product-gallery-item gallery-item " id="imgg7a">
-                        <img class="product-image-feature" src="images/detailproduct/8.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
-                      <li class="product-gallery-item gallery-item " id="imgg8a">
-                        <img class="product-image-feature" src="images/detailproduct/6.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
-                      </li>
-
+                      <?php
+                      echo "<li class=\"product-gallery-item gallery-item
+                      current \" id=\"imgg1a\">
+                      <img class=\"product-image-feature \" src=\"{$product['imgsrc1']}\"
+                        alt=\"{$product['name']}\" grape=\"\">
+                    </li>
+                    <li class=\"product-gallery-item gallery-item
+                      current \" id=\"imgg2a\">
+                      <img class=\"product-image-feature \" src=\"{$product['imgsrc2']}\"
+                        alt=\"{$product['name']}\" grape=\"\">
+                    </li>
+                    ";
+                      ?>
                     </ul>
                     <div class="product-image__button">
                       <div id="product-zoom-in" class="product-zoom
                         icon-pr-fix" aria-label="Zoom in" title="Zoom in">
                         <span class="zoom-in" aria-hidden="true">
-                          <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 36 36" style="enable-background:new 0 0 36 36; width:
+                          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 36 36" style="enable-background:new 0 0 36 36; width:
                             30px; height: 30px;" xml:space="preserve">
                             <polyline points="6,14 9,11 14,16 16,14 11,9
                               14,6 6,6">
@@ -413,73 +382,57 @@
                   <div class="owl-carousel owl-theme owl-product-gallery-slide"">
                     <div class=" item">
                     <div class="product-gallery__thumb  >
-                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);"
-                      data-image="images/detailproduct/1.jpg" data-zoom-image="images/detailproduct/1.jpg">
-                      <img src="images/detailproduct/1.jpg" data-image="images/detailproduct/1.jpg"
-                        alt="Nike Air Max 90 Essential" grape="">
+                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/1.jpg" data-zoom-image="images/detailproduct/1.jpg">
+                      <img src="images/detailproduct/1.jpg" data-image="images/detailproduct/1.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
                   <div class="item">
                     <div class="product-gallery__thumb  >
-                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);"
-                      data-image="images/detailproduct/2.jpg" data-zoom-image="images/detailproduct/2.jpg">
-                      <img src="images/detailproduct/2.jpg" data-image="images/detailproduct/2.jpg"
-                        alt="Nike Air Max 90 Essential" grape="">
+                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/2.jpg" data-zoom-image="images/detailproduct/2.jpg">
+                      <img src="images/detailproduct/2.jpg" data-image="images/detailproduct/2.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
                   <div class="item">
                     <div class="product-gallery__thumb  >
-                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);"
-                      data-image="images/detailproduct/3.jpg" data-zoom-image="images/detailproduct/3.jpg">
-                      <img src="images/detailproduct/3.jpg" data-image="images/detailproduct/3.jpg"
-                        alt="Nike Air Max 90 Essential" grape="">
+                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/3.jpg" data-zoom-image="images/detailproduct/3.jpg">
+                      <img src="images/detailproduct/3.jpg" data-image="images/detailproduct/3.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
                   <div class="item">
                     <div class="product-gallery__thumb  >
-                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);"
-                      data-image="images/detailproduct/4.jpg" data-zoom-image="images/detailproduct/4.jpg">
-                      <img src="images/detailproduct/4.jpg" data-image="images/detailproduct/4.jpg"
-                        alt="Nike Air Max 90 Essential" grape="">
+                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/4.jpg" data-zoom-image="images/detailproduct/4.jpg">
+                      <img src="images/detailproduct/4.jpg" data-image="images/detailproduct/4.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
                   <div class="item">
                     <div class="product-gallery__thumb  >
-                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);"
-                      data-image="images/detailproduct/5.jpg" data-zoom-image="images/detailproduct/5.jpg">
-                      <img src="images/detailproduct/5.jpg" data-image="images/detailproduct/5.jpg"
-                        alt="Nike Air Max 90 Essential" grape="">
+                      <a class=" product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/5.jpg" data-zoom-image="images/detailproduct/5.jpg">
+                      <img src="images/detailproduct/5.jpg" data-image="images/detailproduct/5.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
                   <div class="item">
                     <div class="product-gallery__thumb  " id="imgg1">
-                      <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                        data-image="images/detailproduct/6.jpg" data-zoom-image="images/detailproduct/6.jpg">
-                        <img src="images/detailproduct/6.jpg" data-image="images/detailproduct/6.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
+                      <a class="product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/6.jpg" data-zoom-image="images/detailproduct/6.jpg">
+                        <img src="images/detailproduct/6.jpg" data-image="images/detailproduct/6.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
                   <div class="item">
                     <div class="product-gallery__thumb  " id="imgg1">
-                      <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                        data-image="images/detailproduct/7.jpg" data-zoom-image="images/detailproduct/7.jpg">
-                        <img src="images/detailproduct/7.jpg" data-image="images/detailproduct/7.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
+                      <a class="product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/7.jpg" data-zoom-image="images/detailproduct/7.jpg">
+                        <img src="images/detailproduct/7.jpg" data-image="images/detailproduct/7.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
                   <div class="item">
                     <div class="product-gallery__thumb  " id="imgg1">
-                      <a class="product-gallery__thumb-placeholder" href="javascript:void(0);"
-                        data-image="images/detailproduct/8.jpg" data-zoom-image="images/detailproduct/8.jpg">
-                        <img src="images/detailproduct/8.jpg" data-image="images/detailproduct/8.jpg"
-                          alt="Nike Air Max 90 Essential" grape="">
+                      <a class="product-gallery__thumb-placeholder" href="javascript:void(0);" data-image="images/detailproduct/8.jpg" data-zoom-image="images/detailproduct/8.jpg">
+                        <img src="images/detailproduct/8.jpg" data-image="images/detailproduct/8.jpg" alt="Nike Air Max 90 Essential" grape="">
                       </a>
                     </div>
                   </div>
@@ -519,12 +472,12 @@
                 product-content-desc" id="detail-product">
               <div class="product-content-desc-1">
                 <div class="product-title">
-                  <h1>Nike Air Max 90 Essential "Grape"</h1>
+                  <h1><?= $product['name'] ?></h1>
                   <span id="pro_sku">SKU: S-0015-1</span>
                 </div>
-                <div class="product-price" id="price-preview"><span class="pro-price">4,800,000₫</span></div>
-                <form id="add-item-form" action="/cart/add" method="post" class="variants clearfix">
-                  <div class="select clearfix">
+                <div class="product-price" id="price-preview"><span class="pro-price"><?php echo Product::format_price($product['price']); ?>₫</span></div>
+                <form id="add-item-form" method="POST" class="variants clearfix">
+                  <!-- <div class="select clearfix">
                     <div class="selector-wrapper"><label for="product-select-option-0">Màu sắc</label><span
                         class="custom-dropdown custom-dropdown--white"><select class="single-option-selector
                             custom-dropdown__select
@@ -550,8 +503,8 @@
                       <option value="1040409053">Xanh / 37 - 4,800,000₫</option>
                       <option value="1040409054">Xanh / 38 - 4,800,000₫</option>
                     </select>
-                  </div>
-                  <div class="select-swatch clearfix">
+                  </div> -->
+                  <!-- <div class="select-swatch clearfix">
                     <div id="variant-swatch-0" class="swatch clearfix" data-option="option1" data-option-index="0">
 
 
@@ -627,8 +580,8 @@
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="selector-actions">
+                  </div> -->
+                  <!-- <div class="selector-actions">
                     <div class="quantity-area clearfix">
                       <input type="button" value="-" onclick="minusQuantity()" class="qty-btn">
                       <input type="text" id="quantity" name="quantity" value="1" min="1" class="quantity-selector">
@@ -649,15 +602,18 @@
                           !</span></a>
 
                     </div>
+                  </div> -->
+                  <div class="selector-actions">
+                    <div class="quantity-area clearfix">
+                      <input type="button" value="-" onclick="minusQuantity()" class="qty-btn">
+                      <input type="text" id="quantity" name="quantity" value="1" min="1" class="quantity-selector">
+                      <input type="button" value="+" onclick="plusQuantity()" class="qty-btn">
+                    </div>
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="id" value="<?= $product['id'] ?>">
+                    <button type="submit" value="submit_cart" name="submit_cart" id="add-to-cartbottom" class="add-to-cartProduct add-cart-bottom button addtocart-modal" name="add">Thêm vào
+                      giỏ</button>
                   </div>
-                  <!--<div class="product-action-bottom visible-xs">
-                      <div class="input-bottom">
-                        <input id="quan-input" type="number" value="1" min="1">
-                      </div>
-                      <button type="button" id="add-to-cartbottom"
-                        class="add-to-cartProduct add-cart-bottom button addtocart-modal" name="add">Thêm vào
-                        giỏ</button>
-                    </div>-->
                 </form>
                 <div class="product-description">
                   <div class="title-bl">
@@ -698,8 +654,7 @@
                   <div class="product-block">
                     <div class="product-img fade-box">
                       <a href="#" title="Adidas EQT Cushion ADV" class="img-resize">
-                        <img src="images/shoes/800502_01_e92c3b2bb8764b52a791846d84a3a360_grande.jpg"
-                          alt="Adidas EQT Cushion ADV" class="lazyloaded">
+                        <img src="images/shoes/800502_01_e92c3b2bb8764b52a791846d84a3a360_grande.jpg" alt="Adidas EQT Cushion ADV" class="lazyloaded">
                         <img src="images/shoes/shoes fade 1.jpg" alt="Adidas EQT Cushion ADV" class="lazyloaded">
                       </a>
 
@@ -707,8 +662,7 @@
                     <div class="product-detail clearfix">
                       <div class="pro-text">
                         <a style="color: black;
-                            font-size: 14px;text-decoration: none;" href="#" title="Adidas EQT Cushion ADV" inspiration
-                          pack>
+                            font-size: 14px;text-decoration: none;" href="#" title="Adidas EQT Cushion ADV" inspiration pack>
                           Adidas EQT Cushion ADV "North America"
                         </a>
                       </div>
@@ -722,8 +676,7 @@
                   <div class="product-block">
                     <div class="product-img fade-box">
                       <a href="#" title="Adidas Nmd R1" class="img-resize">
-                        <img src="images/shoes/201493_1_017364c87c3e4802a8cda5259e3d5a95_grande.jpg" alt="Adidas Nmd R1"
-                          class="lazyloaded">
+                        <img src="images/shoes/201493_1_017364c87c3e4802a8cda5259e3d5a95_grande.jpg" alt="Adidas Nmd R1" class="lazyloaded">
                         <img src="images/shoes/shoes fade 2.jpg" alt="Adidas Nmd R1" class="lazyloaded">
                       </a>
 
@@ -745,8 +698,7 @@
                   <div class="product-block">
                     <div class="product-img fade-box">
                       <a href="#" title="Adidas PW Solar HU NMD" class="img-resize">
-                        <img src="images/shoes/805266_02_b8b2cdd1782246febf8879a44a7e5021_grande.jpg"
-                          alt="Adidas PW Solar HU NMD" class="lazyloaded">
+                        <img src="images/shoes/805266_02_b8b2cdd1782246febf8879a44a7e5021_grande.jpg" alt="Adidas PW Solar HU NMD" class="lazyloaded">
                         <img src="images/shoes/shoes fade 3.jpg" alt="Adidas PW Solar HU NMD" class="lazyloaded">
                       </a>
 
@@ -754,8 +706,7 @@
                     <div class="product-detail clearfix">
                       <div class="pro-text">
                         <a style="color: black;
-                            font-size: 14px;text-decoration: none;" href="#" title="Adidas PW Solar HU NMD" inspiration
-                          pack>
+                            font-size: 14px;text-decoration: none;" href="#" title="Adidas PW Solar HU NMD" inspiration pack>
                           Adidas PW Solar HU NMD "Inspiration Pack"
                         </a>
                       </div>
@@ -769,8 +720,7 @@
                   <div class="product-block">
                     <div class="product-img fade-box">
                       <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                        <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg"
-                          alt="Adidas Ultraboost W" class="lazyloaded">
+                        <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
                         <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
                       </a>
 
@@ -778,8 +728,7 @@
                     <div class="product-detail clearfix">
                       <div class="pro-text">
                         <a style="color: black;
-                            font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration
-                          pack>
+                            font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
                           Adidas Ultraboost W
                         </a>
                       </div>
@@ -802,33 +751,33 @@
     <!-- show zoom detail product -->
     <!-- zoom -->
     <div class="product-zoom11">
-     <div class="product-zom">
-      <div class="divclose">
-        <i class="fa fa-times-circle"></i>
+      <div class="product-zom">
+        <div class="divclose">
+          <i class="fa fa-times-circle"></i>
+        </div>
+        <div class="owl-carousel owl-theme owl-product1">
+
+          <div class="item"><img src="images/detailproduct/1.jpg" alt="">
+          </div>
+          <div class="item"><img src="images/detailproduct/2.jpg" alt="">
+          </div>
+          <div class="item"><img src="images/detailproduct/3.jpg" alt="">
+          </div>
+          <div class="item"><img src="images/detailproduct/4.jpg" alt="">
+          </div>
+          <div class="item"><img src="images/detailproduct/5.jpg" alt="">
+          </div>
+          <div class="item"><img src="images/detailproduct/6.jpg" alt="">
+          </div>
+          <div class="item"><img src="images/detailproduct/7.jpg" alt="">
+          </div>
+          <div class="item"><img src="images/detailproduct/8.jpg" alt="">
+          </div>
+
+
+
+        </div>
       </div>
-      <div class="owl-carousel owl-theme owl-product1">
-
-        <div class="item"><img src="images/detailproduct/1.jpg" alt="">
-        </div>
-        <div class="item"><img src="images/detailproduct/2.jpg" alt="">
-        </div>
-        <div class="item"><img src="images/detailproduct/3.jpg" alt="">
-        </div>
-        <div class="item"><img src="images/detailproduct/4.jpg" alt="">
-        </div>
-        <div class="item"><img src="images/detailproduct/5.jpg" alt="">
-        </div>
-        <div class="item"><img src="images/detailproduct/6.jpg" alt="">
-        </div>
-        <div class="item"><img src="images/detailproduct/7.jpg" alt="">
-        </div>
-        <div class="item"><img src="images/detailproduct/8.jpg" alt="">
-        </div>
-
-
-
-      </div>
-     </div>
     </div>
 
   </main>
@@ -958,12 +907,8 @@
               <div class="footer-content">
                 <div id="fb-root">
                   <div class="footer-static-content">
-                    <div class="fb-page" data-href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/"
-                      data-tabs="timeline" data-width="" data-height="215" data-small-header="false"
-                      data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
-                      <blockquote cite="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/"
-                        class="fb-xfbml-parse-ignore"><a
-                          href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/">AziWorld
+                    <div class="fb-page" data-href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/" data-tabs="timeline" data-width="" data-height="215" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
+                      <blockquote cite="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/">AziWorld
                           Viet Nam</a>
                       </blockquote>
                     </div>

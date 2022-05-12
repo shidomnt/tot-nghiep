@@ -1,3 +1,25 @@
+<?php
+session_start();
+include './src/connect.php';
+include './src/control.php';
+if (!isset($_SESSION['user'])) {
+  if (isset($_POST['dangnhap'])) {
+    $data = new Data();
+    $statusCode = $data->login(
+      $_POST['email'],
+      $_POST['password']
+    );
+    if ($statusCode == 0) {
+      $_SESSION['user'] = $_POST['email'];
+      header("Location: index.html");
+    } else {
+      echo "<script>alert('{$data->getStatusMessage($statusCode)}')</script>";
+    }
+  }
+} else {
+  header("Location: index.html");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -48,17 +70,17 @@
             </a>
             <ul class="sub_menu">
               <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 1"> 
+                <a href="detailproduct.html" title="Sản phẩm - Style 1">
                   Sản phẩm - Style 1
                 </a>
               </li>
               <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 2"> 
+                <a href="detailproduct.html" title="Sản phẩm - Style 2">
                   Sản phẩm - Style 2
                 </a>
               </li>
               <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 3"> 
+                <a href="detailproduct.html" title="Sản phẩm - Style 3">
                   Sản phẩm - Style 3
                 </a>
               </li>
@@ -85,38 +107,37 @@
           text-transform: uppercase;
           margin: 3px 0 30px 0;
           font-weight: 500; letter-spacing: 2px;">MENU</h3>
-            <div class="justify-content-md-center">
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="index.html">TRANG CHỦ</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle aaaa"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false" >
-                    <p>SẢN PHẨM</p>
-                    <i class="fa fa-angle-double-right"></i>
+          <div class="justify-content-md-center">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">TRANG CHỦ</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle aaaa" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <p>SẢN PHẨM</p>
+                  <i class="fa fa-angle-double-right"></i>
 
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="border:0;">
-                    <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 1">Sản phẩm - Style 1</a>
-                    <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 2">Sản phẩm - Style 2</a>
-                    <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 3">Sản phẩm - Style 3</a>
-                  </div>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="introduce.html">GIỚI THIỆU</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="blog.html">BLOG</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="Contact.html">LIÊN HỆ</a>
-                </li>
-              </ul>
-            </div>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="border:0;">
+                  <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 1">Sản phẩm - Style 1</a>
+                  <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 2">Sản phẩm - Style 2</a>
+                  <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 3">Sản phẩm - Style 3</a>
+                </div>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="introduce.html">GIỚI THIỆU</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="blog.html">BLOG</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="Contact.html">LIÊN HỆ</a>
+              </li>
+            </ul>
+          </div>
 
         </div>
       </div>
@@ -135,46 +156,44 @@
             <form action="search" class="searchform searchform-categoris ultimate-search">
               <div class="wpo-search-inner" style="display:inline">
                 <input type="hidden" name="type" value="product">
-                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off"
-                  class="searchinput input-search search-input" type="text" size="20"
-                  placeholder="Tìm kiếm sản phẩm...">
+                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off" class="searchinput input-search search-input" type="text" size="20" placeholder="Tìm kiếm sản phẩm...">
               </div>
               <button type="submit" class="btn-search btn" id="search-header-btn">
                 <i style="font-weight:bold" class="fas fa-search"></i>
               </button>
               <div class="search-item">
-                  <div class="search-item-left">
-                      <div class="item-name">Adidas</div>
-                      <div class="item-price">1.600.000$</div>
+                <div class="search-item-left">
+                  <div class="item-name">Adidas</div>
+                  <div class="item-price">1.600.000$</div>
+                </div>
+                <div class="search-item-right">
+                  <div class="img">
+                    <img src="images/shoes/1.jpg" alt="">
                   </div>
-                  <div class="search-item-right">
-                      <div class="img">
-                          <img src="images/shoes/1.jpg" alt="">
-                      </div>
-                  </div>
+                </div>
               </div>
               <div class="search-item">
                 <div class="search-item-left">
-                    <div class="item-name">Adidas</div>
-                    <div class="item-price">1.600.000$</div>
+                  <div class="item-name">Adidas</div>
+                  <div class="item-price">1.600.000$</div>
                 </div>
                 <div class="search-item-right">
-                    <div class="img">
-                        <img src="images/shoes/1.jpg" alt="">
-                    </div>
+                  <div class="img">
+                    <img src="images/shoes/1.jpg" alt="">
+                  </div>
                 </div>
-            </div>
-            <div class="search-item">
+              </div>
+              <div class="search-item">
                 <div class="search-item-left">
-                    <div class="item-name">Adidas</div>
-                    <div class="item-price">1.600.000$</div>
+                  <div class="item-name">Adidas</div>
+                  <div class="item-price">1.600.000$</div>
                 </div>
                 <div class="search-item-right">
-                    <div class="img">
-                        <img src="images/shoes/1.jpg" alt="">
-                    </div>
+                  <div class="img">
+                    <img src="images/shoes/1.jpg" alt="">
+                  </div>
                 </div>
-            </div>
+              </div>
             </form>
             <div id="ajaxSearchResults" class="smart-search-wrapper ajaxSearchResults" style="display: none">
               <div class="resultsContent"></div>
@@ -198,16 +217,13 @@
               <table id="cart-view">
                 <tbody>
                   <tr class="item_1">
-                    <td class="img"><a href="" title="Nike Air Max 90 Essential &quot;Grape&quot;"><img
-                          src="images/shoes/1.jpg" alt="/products/nike-air-max-90-essential-grape"></a></td>
+                    <td class="img"><a href="" title="Nike Air Max 90 Essential &quot;Grape&quot;"><img src="images/shoes/1.jpg" alt="/products/nike-air-max-90-essential-grape"></a></td>
                     <td>
-                      <a class="pro-title-view" style="color: #272727" href=""
-                        title="Nike Air Max 90 Essential &quot;Grape&quot;">Nike Air Max 90 Essential "Grape"</a>
+                      <a class="pro-title-view" style="color: #272727" href="" title="Nike Air Max 90 Essential &quot;Grape&quot;">Nike Air Max 90 Essential "Grape"</a>
                       <span class="variant">Tím / 36</span>
                       <span class="pro-quantity-view">1</span>
                       <span class="pro-price-view">4,800,000₫</span>
-                      <span class="remove_link remove-cart"><a href=""><i style="color: #272727;"
-                            class="fas fa-times"></i></a></span>
+                      <span class="remove_link remove-cart"><a href=""><i style="color: #272727;" class="fas fa-times"></i></a></span>
                     </td>
                   </tr>
                 </tbody>
@@ -240,12 +256,11 @@
         <a href="#" class="" uk-toggle="target: #offcanvas-flip">
           <i class="fas fa-search" style="color: black"></i>
         </a>
-        
+
         <a style="color: #272727" href="#" uk-toggle="target: #offcanvas-flip2">
           <i class="fas fa-shopping-cart"></i>
         </a>
-        <button class="navbar-toggler" type="button" uk-toggle="target: #offcanvas-flip1" data-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" uk-toggle="target: #offcanvas-flip1" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
       </div>
@@ -254,57 +269,57 @@
 
   </nav>
 
- 
+
   <!--Content-->
   <div class="content">
-    <section class="signup">
-        <div class="container">
-            <div class="signin-left">
-                <div class="sign-title">
-                    <h1>Tạo tài khoản</h1>
-                </div>
-            </div>
-            <div class="signin-right ">
-                <form action="">
-                    <div class="firstname form-control1 ">
-                        <input type="text"   id="firstname" placeholder="Họ">
-                    </div>
-                    <div class="lastname form-control1">
-                        <input type="text" id="lastname" placeholder="Tên">
-                    </div>
-                    <div class="sex form-control1">
-                       <div class="female">
-                         
-                          <input type="radio" id="female" checked  name="sex">
-                          <label for="female">Nữ</label>
-                       </div>
-                       <div class="male">
-                        
-                        <input type="radio" id="male"  name="sex">
-                        <label for="male" >Nam</label>
-                     </div>
-                    </div>
-                    <div class="birthday form-control1">
-                        <input type="text" id="birthday" placeholder="mm/dd/yyyy">
-                    </div>
-                    <div class="email form-control1">
-                        <input type="email"  id="email" placeholder="Email">
-                    </div>
-                    <div class="password form-control1">
-                        <input type="password"  id="password" placeholder="Password">
-                    </div>
-                    <div class="recaptcha form-control1">This site is protected by reCAPTCHA and the Google <a href="">Privacy Policy</a> and <a href="">Terms of Service</a> apply.</div>
-                    <div class="submit">
-                      <p>Đăng kí</p>
-                       
-                    </div>
-                    <div class="backto">
-                      <a href=""><i class="fa fa-long-arrow-alt-left"></i> Quay lại trang chủ</a>
-                    </div>
-                </form>
-            </div>
+    <section class="signin ">
+      <div class="container">
+        <div class="signin-left">
+          <div class="sign-title">
+            <h1>Đăng nhập</h1>
+          </div>
         </div>
-    </section>    
+        <div class="signin-right " id="a-sign">
+          <form method="POST">
+            <div class="username form-control1 ">
+              <input type="email" id="username" name="email" placeholder="Email">
+            </div>
+            <div class="password form-control1">
+              <input type="password" id="password" name="password" placeholder="Mật khẩu">
+              <div class="error" style="position: absolute; bottom: 0;background: #fff; padding:10px; border:1px solid #ccc; color: red">Please fill out this field </div>
+            </div>
+
+            <div class="recaptcha form-control1">This site is protected by reCAPTCHA and the Google <a href="">Privacy Policy</a> and <a href="">Terms of Service</a> apply.</div>
+            <div class="submit">
+              <input class="btn" type="submit" id="dangnhap" name="dangnhap" value="Đăng Nhập">
+              <div class="forgetpassword">
+                <p id="quenmk">Quên mật khẩu?</p> hoặc <a href="">Đăng kí</a>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="signin-right " id="b-sign">
+          <form action="">
+            <div class="username form-control1 ">
+              <h2>Phục hồi mật khẩu</h2>
+            </div>
+            <div class="password form-control1">
+              <input type="text" id="password" placeholder="Mật khẩu">
+            </div>
+
+            <div class="recaptcha form-control1">This site is protected by reCAPTCHA and the Google <a href="">Privacy Policy</a> and <a href="">Terms of Service</a> apply.</div>
+            <div class="submit">
+              <input class="btn" type="submit" value="Gửi">
+              <div class="forgetpassword">
+                <a href="" id="huy">Hủy</a>
+              </div>
+
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </section>
     <section class="section section-gallery">
       <div class="">
         <div class="hot_sp" style="padding-top: 70px;padding-bottom: 50px;">
@@ -423,12 +438,8 @@
                 <div class="footer-content">
                   <div id="fb-root">
                     <div class="footer-static-content">
-                      <div class="fb-page" data-href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/"
-                        data-tabs="timeline" data-width="" data-height="215" data-small-header="false"
-                        data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
-                        <blockquote cite="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/"
-                          class="fb-xfbml-parse-ignore"><a
-                            href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/">AziWorld Viet Nam</a>
+                      <div class="fb-page" data-href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/" data-tabs="timeline" data-width="" data-height="215" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
+                        <blockquote cite="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/">AziWorld Viet Nam</a>
                         </blockquote>
                       </div>
                     </div>
@@ -443,14 +454,13 @@
         <div class="container">
           <hr>
           <div class="main-footer--border" style="text-align:center;padding-bottom: 15px;">
-            <p>Copyright © 2019 <a href="https://runner-inn.myharavan.com"> Runner Inn</a>. <a target="_blank"
-                href="https://www.facebook.com/henrynguyen202">Powered by HuniBlue</a></p>
+            <p>Copyright © 2019 <a href="https://runner-inn.myharavan.com"> Runner Inn</a>. <a target="_blank" href="https://www.facebook.com/henrynguyen202">Powered by HuniBlue</a></p>
           </div>
         </div>
       </div>
     </footer>
   </div>
- 
+
   <script async defer crossorigin="anonymous" src="plugins/sdk.js"></script>
   <script src="plugins/jquery-3.4.1/jquery-3.4.1.min.js"></script>
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
@@ -461,6 +471,7 @@
   <script src="js/script.js"></script>
   <script src="plugins/uikit/uikit.min.js"></script>
   <script src="plugins/uikit/uikit-icons.min.js"></script>
+  <script src="js/sign.js"></script>
 </body>
 
 </html>

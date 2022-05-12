@@ -257,55 +257,65 @@
  
   <!--Content-->
   <div class="content">
-    <section class="signin ">
+    <section class="signup">
         <div class="container">
             <div class="signin-left">
                 <div class="sign-title">
-                    <h1>Đăng nhập</h1>
+                    <h1>Tạo tài khoản</h1>
                 </div>
             </div>
-            <div class="signin-right " id="a-sign">
-                <form action="">
-                    <div class="username form-control1 ">
-                        <input type="email"   id="username" placeholder="Email">
+            <div class="signin-right ">
+                <form method="POST">
+                    <div class="firstname form-control1 ">
+                        <input required type="text" name="firstname" placeholder="Họ">
                     </div>
-                    <div class="password form-control1">
-                        <input type="password" id="password" placeholder="Mật khẩu">
-                        <div class="error" style="position: absolute; bottom: 0;background: #fff; padding:10px; border:1px solid #ccc; color: red">Please fill out this field </div>
+                    <div class="lastname form-control1">
+                        <input required type="text" name="lastname" placeholder="Tên">
+                    </div>
+                    <div class="sex form-control1">
+                       <div class="female">
+                          <input type="radio" id="female" checked value="female"  name="sex">
+                          <label for="female">Nữ</label>
+                       </div>
+                       <div class="male">
                         
-                       
+                        <input type="radio" id="male" value="male" name="sex">
+                        <label for="male" >Nam</label>
+                     </div>
                     </div>
-                 
-                    <div class="recaptcha form-control1">This site is protected by reCAPTCHA and the Google <a href="">Privacy Policy</a> and <a href="">Terms of Service</a> apply.</div>
-                    <div class="submit">
-                      <input class="btn" type="submit" id="dangnhap" value="Đăng Nhập">
-                    <div class="forgetpassword">
-                            <p id="quenmk">Quên mật khẩu?</p> hoặc <a href="">Đăng kí</a>
-                      </div>
-                       
+                    <div class="birthday form-control1">
+                        <input required type="text" name="birthday" placeholder="mm/dd/yyyy">
                     </div>
-                    
-                </form>
-            </div>
-            <div class="signin-right " id="b-sign">
-                <form action="">
-                    <div class="username form-control1 ">
-                       <h2>Phục hồi mật khẩu</h2>
+                    <div class="email form-control1">
+                        <input required type="email"  name="email" placeholder="Email">
                     </div>
                     <div class="password form-control1">
-                        <input type="text" id="password" placeholder="Mật khẩu">
+                        <input required type="password"  name="password" placeholder="Password">
                     </div>
-                 
                     <div class="recaptcha form-control1">This site is protected by reCAPTCHA and the Google <a href="">Privacy Policy</a> and <a href="">Terms of Service</a> apply.</div>
-                    <div class="submit">
-                      <input class="btn" type="submit" value="Gửi">
-                      <div class="forgetpassword">
-                            <a href="" id="huy">Hủy</a>
-                      </div>
-                       
+                      <input type="submit" name="signup" value="Đăng kí">
+                    <div class="backto">
+                      <a href=""><i class="fa fa-long-arrow-alt-left"></i> Quay lại trang chủ</a>
                     </div>
-                    
                 </form>
+                <?php 
+                include './src/connect.php';
+                include './src/control.php';
+                if (isset($_POST['signup'])) {
+                  $data = new Data();
+                  $result = $data->register(
+                    $_POST['firstname'],
+                    $_POST['lastname'],
+                    $_POST['sex'],
+                    $_POST['birthday'],
+                    $_POST['email'],
+                    $_POST['password']
+                  );
+                  if ($result) {
+                    echo "<script>window.location.href = 'signin.html'</script>";
+                  }
+                }
+                ?>
             </div>
         </div>
     </section>    
@@ -465,7 +475,6 @@
   <script src="js/script.js"></script>
   <script src="plugins/uikit/uikit.min.js"></script>
   <script src="plugins/uikit/uikit-icons.min.js"></script>
-  <script src="js/sign.js"></script>
 </body>
 
 </html>

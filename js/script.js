@@ -104,7 +104,7 @@ $(document).ready(function () {
         e.stopPropagation();
 
     });
-    $('.registratior_custom').fadeIn(200);
+    // $('.registratior_custom').fadeIn(200);
     $('.x-close').click(function (e) {
         e.preventDefault();
         $('.registratior_custom').fadeOut(0);

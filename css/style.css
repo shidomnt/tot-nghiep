@@ -14,14 +14,14 @@
   width: 100%;
   /* padding-top: 50px; */
   height: 100vh;
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
   background-color: rgba(10, 10, 10, 0.6);
   position: fixed;
   top: 0;
   z-index: 999999999999999999999999;
-  /* display: none; */
+  display: none;
 }
 .registratior_custom form {
   width: 50%;
