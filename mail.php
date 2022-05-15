@@ -1,6 +1,11 @@
 <?php
 session_start();
 include './vendor/autoload.php';
+include './src/connect.php';
+include './src/control.php';
+include './src/cart.php';
+include './src/product.php';
+$cart = new Cart();
 
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -15,6 +20,7 @@ $to = $_SESSION['user'];
 
 try {
   $mail->IsSMTP();
+  $mail->CharSet = 'UTF-8';
   $mail->Mailer = "smtp";
   $mail->SMTPDebug  = 0;
   $mail->SMTPAuth   = TRUE;
@@ -27,10 +33,10 @@ try {
   $mail->AddAddress($to);
   $mail->SetFrom("developerworking7@gmail.com", "Shoe");
   $mail->Subject = "Xác nhận mua hàng";
-  $content = "<b>This is a Test Email sent via Gmail SMTP Server using PHP mailer class.</b>";
+  $content = $cart->to_content_mail();
   $mail->MsgHTML($content);
-  
   $mail->send();
+  unset($_SESSION['cart']);
   header("Location: {$_SERVER['HTTP_REFERER']}", true, 303);
 } catch (Exception $e) {
   echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";

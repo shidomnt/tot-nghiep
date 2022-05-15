@@ -26,7 +26,6 @@ if (isset($_POST['submit_cart'])) {
     default:
       break;
   }
-  $_SESSION["opencart"] = 1;
   if (!empty($_SERVER['HTTP_REFERER'])) {
     header("Location: {$_SERVER['HTTP_REFERER']}", true, 303);
   }
@@ -61,6 +60,14 @@ if (isset($_POST['submit_cart'])) {
   <!-- UIkit CSS -->
   <link rel="stylesheet" href="plugins/uikit/uikit.min.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css">
+  <style>
+    a.disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  user-select: none;
+  opacity: 0.5;
+}
+  </style>
 </head>
 
 <body>
@@ -237,8 +244,8 @@ if (isset($_POST['submit_cart'])) {
                     <td class="text-right" id="total-view-cart"><?= Product::format_price($cart->total()) ?></td>
                   </tr>
                   <tr>
-                    <td class="distance-td"><a href="" class="linktocart button dark">Xem giỏ hàng</a></td>
-                    <td><a href="mail.php" class="linktocheckout button dark">Thanh toán</a></td>
+                    <td class="distance-td"><a href="" class="linktocart button dark" style="color: #fff;">Xem giỏ hàng</a></td>
+                    <td><a href="mail.php" class="linktocheckout button dark <?php echo empty($_SESSION['cart']) ? "disabled" : "" ?>" style="color: #fff;">Thanh toán</a></td>
                   </tr>
                 </tbody>
               </table>

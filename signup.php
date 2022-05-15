@@ -312,7 +312,7 @@
                     $_POST['password']
                   );
                   if ($result) {
-                    echo "<script>window.location.href = 'signin.html'</script>";
+                    echo "<script>window.location.href = 'signin.php'</script>";
                   }
                 }
                 ?>
