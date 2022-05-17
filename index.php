@@ -1,3 +1,32 @@
+<?php 
+session_start();
+include './src/connect.php';
+include './src/control.php';
+include './src/cart.php';
+include './src/product.php';
+$cart = new Cart();
+
+if (isset($_POST['submit_cart'])) {
+  switch ($_POST['action']) {
+    case 'add':
+      $cart->add($_POST['id'], isset($_POST['quantity']) ? $_POST['quantity'] : 1);
+      break;
+    case 'remove':
+      $cart->remove($_POST['id']);
+      break;
+    default:
+      break;
+  }
+  if (!empty($_SERVER['HTTP_REFERER'])) {
+    header("Location: {$_SERVER['HTTP_REFERER']}", true, 303);
+  }
+  else {
+    header("Location: /", true, 303);
+  }
+}
+$_SESSION['mail_success'] = 0;
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,47 +49,44 @@
 </head>
 
 <body>
-  <div class="header">
+  <!-- <div class="header">
     <a style="color: #ffffff;text-decoration: none;" href="index.html">MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG NỘI THÀNH > 300K
       - ĐỔI TRẢ TRONG 30 NGÀY - ĐẢM BẢO CHẤT LƯỢNG</a>
-  </div>
+  </div> -->
 
   <!--Navbar-->
 
   <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
 
     <div class="container">
-      <a class="navbar-brand" href="index.html">
-        <!--<img src="images/logo.png" class="logo-top" alt="">-->
+      <a class="navbar-brand" href="index.php">
+        <img src="images/logo.png" class="logo-top" alt="">
       </a>
       <div class="desk-menu collapse navbar-collapse justify-content-md-center" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item active">
-            <a class="nav-link" href="index.html">TRANG CHỦ</a>
+            <a class="nav-link" href="#">TRANG CHỦ</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
           </li>
           <li class="nav-item lisanpham">
-            <a class="nav-link" href="detailproduct.html">SẢN PHẨM
+            <a class="nav-link" href="detailproduct.php">SẢN PHẨM
               <i class="fa fa-chevron-down" aria-hidden="true"></i>
             </a>
             <ul class="sub_menu">
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 1"> 
-                  Sản phẩm - Style 1
-                </a>
-              </li>
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 2"> 
-                  Sản phẩm - Style 2
-                </a>
-              </li>
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 3"> 
-                  Sản phẩm - Style 3
-                </a>
-              </li>
+              <?php 
+                $result = Product::query('SELECT * FROM products LIMIT 3');
+                while ($product = mysqli_fetch_assoc($result)) {
+                  echo "
+                    <li class=''>
+                      <a href='detailproduct.php?id={$product['id']}' title='{$product['name']}'> 
+                      {$product['name']}
+                      </a>
+                    </li>
+                  ";
+                }
+              ?>
             </ul>
           </li>
           <li class="nav-item">
@@ -87,10 +113,10 @@
             <div class="justify-content-md-center">
               <ul class="navbar-nav">
                 <li class="nav-item">
-                  <a class="nav-link" href="index.html">TRANG CHỦ</a>
+                  <a class="nav-link" href="index.php">TRANG CHỦ</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
+                  <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
                 </li>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle aaaa"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
@@ -131,10 +157,9 @@
                 margin: 3px 0 30px 0;
                 font-weight: 500; letter-spacing: 2px;">Tìm kiếm</h3>
           <div class="search-box wpo-wrapper-search">
-            <form action="search" class="searchform searchform-categoris ultimate-search">
+          <form action="product.php" class="searchform searchform-categoris ultimate-search">
               <div class="wpo-search-inner" style="display:inline">
-                <input type="hidden" name="type" value="product">
-                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off"
+                <input required="" id="inputSearchAuto" name="search" maxlength="40" autocomplete="off"
                   class="searchinput input-search search-input" type="text" size="20"
                   placeholder="Tìm kiếm sản phẩm...">
               </div>
@@ -162,7 +187,7 @@
           <div class="site-nav-container-last" style="color:#272727">
             <div class="cart-view clearfix">
               <table id="cart-view">
-                <tbody>
+                <!-- <tbody>
                   <tr class="item_1">
                     <td class="img"><a href="" title="Nike Air Max 90 Essential &quot;Grape&quot;"><img
                           src="images/shoes/1.jpg" alt="/products/nike-air-max-90-essential-grape"></a></td>
@@ -176,11 +201,34 @@
                             class="fas fa-times"></i></a></span>
                     </td>
                   </tr>
+                </tbody> -->
+                <tbody>
+                  <?php
+                  $cart->foreach_product(function ($is_error, $product, $quantity) {
+                    if (!$is_error) {
+                      $totalprice = Product::format_price($product['price'] * $quantity);
+                      echo "<tr class=\"item_1\">
+                        <td class=\"img\"><a href=\"detailproduct.php?id={$product['id']}\" title=\"{$product['name']}\"><img src=\"{$product['imgsrc1']}\" alt=\"{$product['name']}\"></a></td>
+                        <td>
+                          <a class=\"pro-title-view\" style=\"color: #272727\" href=\"javascript:void(0)\" title=\"{$product['name']}\">{$product['name']}</a>
+                          <!-- <span class=\"variant\">Tím / 36</span> -->
+                          <span class=\"pro-quantity-view\">$quantity</span>
+                          <span class=\"pro-price-view\">{$totalprice}₫</span>
+                          <form method='POST'>
+                            <input type=\"hidden\" name=\"action\" value=\"remove\">
+                            <input type=\"hidden\" name=\"id\" value=\"{$product['id']}\">
+                            <span class=\"remove_link remove-cart\"><button style=\"background: none;border: none;\" type=\"submit\" name=\"submit_cart\" value=\"remove\"><i style=\"color: #272727;\" class=\"fas fa-times\"></i></button></span>
+                          </form>
+                          </td>
+                      </tr>";
+                    }
+                  });
+                  ?>
                 </tbody>
               </table>
               <span class="line"></span>
               <table class="table-total">
-                <tbody>
+                <!-- <tbody>
                   <tr>
                     <td class="text-left">TỔNG TIỀN:</td>
                     <td class="text-right" id="total-view-cart">4,800,000₫</td>
@@ -189,18 +237,28 @@
                     <td class="distance-td"><a href="" class="linktocart button dark">Xem giỏ hàng</a></td>
                     <td><a href="" class="linktocheckout button dark">Thanh toán</a></td>
                   </tr>
+                </tbody> -->
+                <tbody>
+                  <tr>
+                    <td class="text-left">TỔNG TIỀN:</td>
+                    <td class="text-right" id="total-view-cart"><?= Product::format_price($cart->total()) ?></td>
+                  </tr>
+                  <tr>
+                    <td class="distance-td"><a href="" class="linktocart button dark" style="color: #fff;">Xem giỏ hàng</a></td>
+                    <td><a href="mail.php" class="linktocheckout button dark <?php echo empty($_SESSION['cart']) ? "disabled" : "" ?>" style="color: #fff;">Thanh toán</a></td>
+                  </tr>
                 </tbody>
               </table>
 
-              <a href="" target="_blank" class="button btn-check" style="text-decoration:none;"><span>Click nhận mã giảm
-                  giá ngay !</span></a>
+              <!-- <a href="" target="_blank" class="button btn-check" style="text-decoration:none;"><span>Click nhận mã giảm
+                  giá ngay !</span></a> -->
             </div>
           </div>
         </div>
       </div>
 
       <div class="icon-ol">
-        <a style="color: #272727" href="">
+        <a style="color: #272727" href="profile.php">
           <i class="fas fa-user-alt"></i>
         </a>
         <a href="#" class="" uk-toggle="target: #offcanvas-flip">
@@ -240,198 +298,74 @@
     <!--Product-->
     <div class="container" style="padding-bottom: 50px;">
       <div class="row">
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title="Adidas EQT Cushion ADV" class="img-resize">
-                <img src="images/shoes/801740_1_e4adfa6d09b7468a8c9fb21bf8e02bd4_medium (1).jpg"
-                  alt="Adidas EQT Cushion ADV" class="lazyloaded">
-                <img src="images/shoes/shoes fade 1.jpg" alt="Adidas EQT Cushion ADV" class="lazyloaded">
-              </a>
-             
-            </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                                                  font-size: 14px;text-decoration: none;" href="#"
-                  title="Adidas EQT Cushion ADV" inspiration pack>
-                  Adidas EQT Cushion ADV "North America"
+        <?php 
+        $result = Product::query('SELECT * FROM products LIMIT 4');
+          while ($row = mysqli_fetch_assoc($result)) {
+            $price = Product::format_price($row['price']);
+            echo "<div class=\"col-md-3 col-sm-6 col-xs-6 col-6\">
+            <div class=\"product-block\">
+              <div class=\"product-img fade-box\">
+                <a href=\"detailproduct.php?id={$row['id']}\" title=\"{$row['name']}\" class=\"img-resize\">
+                  <img
+                    src=\"{$row['imgsrc1']}\"
+                    alt=\"{$row['name']}\" class=\"lazyloaded\">
+                  <img
+                    src=\"{$row['imgsrc2']}\"
+                    alt=\"{$row['name']}\" class=\"lazyloaded\">
                 </a>
+                
               </div>
-              <div class="pro-price">
-                <p class="">7,000,000₫</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title="Adidas Nmd R1" class="img-resize">
-                <img src="images/shoes/201493_1_017364c87c3e4802a8cda5259e3d5a95_grande.jpg" alt="Adidas Nmd R1"
-                  class="lazyloaded">
-                <img src="images/shoes/shoes fade 2.jpg" alt="Adidas Nmd R1" class="lazyloaded">
-              </a>
-             
-            </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                                          font-size: 14px;text-decoration: none;" title="Adidas Nmd R1" href="">
-                  Adidas Nmd R1 "Villa Exclusive"
-                </a>
-              </div>
-              <div class="pro-price">
-                <p class="">7,000,000₫</p>
+              <div class=\"product-detail clearfix\">
+                <div class=\"pro-text\">
+                  <a style=\" color: black;
+                                                          font-size: 14px;text-decoration: none;\" href=\"#\"
+                    title=\"{$row['name']}\" inspiration pack>
+                    {$row['name']}
+                  </a>
+                </div>
+                <div class=\"pro-price\">
+                  <p>{$price}₫</p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title="Adidas PW Solar HU NMD" class="img-resize">
-                <img src="images/shoes/805266_02_b8b2cdd1782246febf8879a44a7e5021_grande.jpg"
-                  alt="Adidas PW Solar HU NMD" class="lazyloaded">
-                <img src="images/shoes/shoes fade 3.jpg" alt="Adidas PW Solar HU NMD" class="lazyloaded">
-              </a>
-             
-            </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                            font-size: 14px;text-decoration: none;" href="#" title="Adidas PW Solar HU NMD" inspiration
-                  pack>
-                  Adidas PW Solar HU NMD "Inspiration Pack"
-                </a>
-              </div>
-              <div class="pro-price">
-                <p class="">5,000,000₫</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W"
-                  class="lazyloaded">
-                <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-              </a>
-             
-            </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                       font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                  Adidas Ultraboost W
-                </a>
-              </div>
-              <div class="pro-price">
-                <p class="">5,300,000₫</p>
-              </div>
-            </div>
-          </div>
-        </div>
+          </div>";
+          }
+        ?>
       </div>
       <div class="row">
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title="Adidas Yeezy boost 350 v2" class="img-resize">
-                <img class="lazyloaded" src="images/shoes/800502_01_e92c3b2bb8764b52a791846d84a3a360_grande.jpg"
-                  alt="Adidas Yeezy boost 350 v2">
-                <img class="lazyloaded" src="images/shoes/shoes fade 5.jpg" alt="Adidas Yeezy boost 350 v2">
+        <?php 
+        $result = Product::query('SELECT * FROM products LIMIT 4, 4');
+        while ($row = mysqli_fetch_assoc($result)) {
+          $price = Product::format_price($row['price']);
+          echo "<div class=\"col-md-3 col-sm-6 col-xs-6 col-6\">
+          <div class=\"product-block\">
+            <div class=\"product-img fade-box\">
+              <a href=\"detailproduct.php?id={$row['id']}\" title=\"{$row['name']}\" class=\"img-resize\">
+                <img
+                  src=\"{$row['imgsrc1']}\"
+                  alt=\"{$row['name']}\" class=\"lazyloaded\">
+                <img
+                  src=\"{$row['imgsrc2']}\"
+                  alt=\"{$row['name']}\" class=\"lazyloaded\">
               </a>
-             
+              
             </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                      font-size: 14px;text-decoration: none;" href="#" title="Adidas Yeezy boost 350 v2" inspiration
-                  pack>
-
-                  Adidas Yeezy boost 350 v2 "zebra"
-
+            <div class=\"product-detail clearfix\">
+              <div class=\"pro-text\">
+                <a style=\" color: black;
+                                                        font-size: 14px;text-decoration: none;\" href=\"#\"
+                  title=\"{$row['name']}\" inspiration pack>
+                  {$row['name']}
                 </a>
               </div>
-              <div class="pro-price">
-                <p class="">6,000,000₫</p>
+              <div class=\"pro-price\">
+                <p>{$price}₫</p>
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title="Adidas Yeezy Boost 700" class="img-resize">
-                <img class="lazyloaded" src="images/shoes/802501_01_eccb69b5bcdf4ef5b209557ec6547774_grande.jpg"
-                  alt="Adidas Yeezy Boost 700">
-                <img class="lazyloaded" src="images/shoes/shoes fade 6.jpg" alt="Adidas Yeezy Boost 700">
-              </a>
-             
-            </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                      font-size: 14px;text-decoration: none;" href="">
-                  Adidas Yeezy Boost 700 "Wave Runner"
-                </a>
-              </div>
-              <div class="pro-price">
-                <p class="">6,800,000₫</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title="Adidas Zx 4000 4d" class="img-resize">
-                <img class="lazyloaded" src="images/shoes/806859_01_1ad7dd36e7b5403286b95a253e00718d_grande.jpg"
-                  alt="Adidas Zx 4000 4d">
-                <img class="lazyloaded" src="images/shoes/shoes fade 7.jpg" alt="Adidas Zx 4000 4d">
-              </a>
-            
-            </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                      font-size: 14px;text-decoration: none;" href="#" title="Adidas Zx 4000 4d" inspiration pack>
-                  Adidas Zx 4000 4d
-                </a>
-              </div>
-              <div class="pro-price">
-                <p class="">6,400,000₫</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-          <div class="product-block">
-            <div class="product-img fade-box">
-              <a href="#" title=" Ultra Boost" class="img-resize">
-                <img class="lazyloaded" src="images/shoes/805338_01_eb7365e97d3f471d872159918a8526a9_grande.jpg"
-                  alt=" Ultra Boost">
-                <img class="lazyloaded" src="images/shoes/shoes fade 8.jpg" alt=" Ultra Boost">
-              </a>
-             
-            </div>
-            <div class="product-detail clearfix">
-              <div class="pro-text">
-                <a style=" color: black;
-                       font-size: 14px;text-decoration: none;" href="#" title="Adidas EQT Cushion ADV" inspiration
-                  pack>
-                  Ultra Boost
-                </a>
-              </div>
-              <div class="pro-price">
-                <p class="">4,700,000₫</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </div>";
+        }
+        ?>
       </div>
     </div>
     <section class="section wrapper-home-banner">
@@ -501,165 +435,47 @@
       </div>
       <div class="container product" style="width: 100%;margin: auto;">
         <div class="owl-carousel owl-theme owl-product-setting">
-          <div class="item">
-            <div class="">
-              <div class="product-block">
-                <div class="product-img fade-box">
-                  <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                    <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W"
-                      class="lazyloaded">
-                    <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                  </a>
-                 
-                </div>
-                <div class="product-detail clearfix">
-                  <div class="pro-text">
-                    <a style=" color: black;
-                           font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                      Adidas Ultraboost W
+          <?php 
+          $result = Product::query('SELECT * FROM products LIMIT 6');
+          while ($row = mysqli_fetch_assoc($result)) {
+            $price = Product::format_price($row['price']);
+            echo "
+            <div class=\"item\">
+              <div class=\"\">
+                <div class=\"product-block\">
+                  <div class=\"product-img fade-box\">
+                    <a href=\"detailproduct.php?id={$row['id']}\" title=\"{$row['name']}\" class=\"img-resize\">
+                      <img
+                        src=\"{$row['imgsrc1']}\"
+                        alt=\"{$row['name']}\" class=\"lazyloaded\">
+                      <img
+                        src=\"{$row['imgsrc2']}\"
+                        alt=\"{$row['name']}\" class=\"lazyloaded\">
                     </a>
+                    
                   </div>
-                  <div class="pro-price">
-                    <p class="">5,300,000₫</p>
+                  <div class=\"product-detail clearfix\">
+                    <div class=\"pro-text\">
+                      <a style=\" color: black;
+                                                              font-size: 14px;text-decoration: none;\" href=\"#\"
+                        title=\"{$row['name']}\" inspiration pack>
+                        {$row['name']}
+                      </a>
+                    </div>
+                    <div class=\"pro-price\">
+                      <p>{$price}₫</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="item">
-            <div class="">
-              <div class="product-block">
-                <div class="product-img fade-box">
-                  <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                    <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W"
-                      class="lazyloaded">
-                    <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                  </a>
-                 
-                </div>
-                <div class="product-detail clearfix">
-                  <div class="pro-text">
-                    <a style=" color: black;
-                           font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                      Adidas Ultraboost W
-                    </a>
-                  </div>
-                  <div class="pro-price">
-                    <p class="">5,300,000₫</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="">
-              <div class="product-block">
-                <div class="product-img fade-box">
-                  <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                    <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W"
-                      class="lazyloaded">
-                    <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                  </a>
-                 
-                </div>
-                <div class="product-detail clearfix">
-                  <div class="pro-text">
-                    <a style=" color: black;
-                           font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                      Adidas Ultraboost W
-                    </a>
-                  </div>
-                  <div class="pro-price">
-                    <p class="">5,300,000₫</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="">
-              <div class="product-block">
-                <div class="product-img fade-box">
-                  <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                    <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W"
-                      class="lazyloaded">
-                    <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                  </a>
-                 
-                </div>
-                <div class="product-detail clearfix">
-                  <div class="pro-text">
-                    <a style=" color: black;
-                           font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                      Adidas Ultraboost W
-                    </a>
-                  </div>
-                  <div class="pro-price">
-                    <p class="">5,300,000₫</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="">
-              <div class="product-block">
-                <div class="product-img fade-box">
-                  <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                    <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W"
-                      class="lazyloaded">
-                    <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                  </a>
-                 
-                </div>
-                <div class="product-detail clearfix">
-                  <div class="pro-text">
-                    <a style=" color: black;
-                           font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                      Adidas Ultraboost W
-                    </a>
-                  </div>
-                  <div class="pro-price">
-                    <p class="">5,300,000₫</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="">
-              <div class="product-block">
-                <div class="product-img fade-box">
-                  <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                    <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W"
-                      class="lazyloaded">
-                    <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                  </a>
-                 
-                </div>
-                <div class="product-detail clearfix">
-                  <div class="pro-text">
-                    <a style=" color: black;
-                           font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                      Adidas Ultraboost W
-                    </a>
-                  </div>
-                  <div class="pro-price">
-                    <p class="">5,300,000₫</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
+          ";
+          }
+          ?>
       </div>
-
-
-
-
       </div>
     </section>
-    <section class="">
+    <!-- <section class="">
       <div class="content">
         <div class="container">
           <div class="hot_sp">
@@ -670,7 +486,6 @@
           </div>
         </div>
       </div>
-      <!--New-->
       <div>
 
         <div class="container">
@@ -767,7 +582,7 @@
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
     <section class="section wrapper-home-newsletter">
       <div class="container-fluid">
         <div class="content-newsletter">
@@ -832,12 +647,12 @@
       </div>
     </section>
     <footer class="main-footer">
-      <div class="container">
+      <!-- <div class="container">
         <div class="">
           <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-3">
               <div class="footer-col footer-block">
-                <!-- <h4 class="footer-title">
+                <h4 class="footer-title">
                   Giới thiệu
                 </h4>
                 <div class="footer-content">
@@ -902,8 +717,8 @@
               <div class="footer-col footer-block">
                 <h4 class="footer-title">
                   FANPAGE
-                </h4> -->
-                <!-- <div class="footer-content">
+                </h4>
+                <div class="footer-content">
                   <div id="fb-root">
                     <div class="footer-static-content">
                       <div class="fb-page" data-href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/"
@@ -916,7 +731,7 @@
                       </div>
                     </div>
                   </div>
-                </div> -->
+                </div>
               </div>
             </div>
           </div>
@@ -930,7 +745,7 @@
                 href="https://www.facebook.com/henrynguyen202">Powered by HuniBlue</a></p>
           </div>
         </div>
-      </div>
+      </div> -->
     </footer>
   </div>
   <div class="registratior_custom">
@@ -949,7 +764,7 @@
               <span>Sản phẩm mới</span>
             </li>
             <li>
-              <span>Sản phẩm bán chạy/span>
+              <span>Sản phẩm bán chạy</span>
             </li>
           </ul>
           <input type="text" placeholder="Đăng kí nhận thông tin">

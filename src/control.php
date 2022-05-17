@@ -39,9 +39,9 @@ class Data
       case 0: 
         return 'Thanh cong';
       case 11: 
-        return 'Sai password';
+        return 'Mật khẩu không chính xác';
       case 12:
-        return 'Sai tai khoan';
+        return 'Tài khoản không tồn tại';
       default:
         return '';
     }

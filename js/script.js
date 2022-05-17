@@ -110,5 +110,23 @@ $(document).ready(function () {
         $('.registratior_custom').fadeOut(0);
     });
 
-
+    
 });
+function minusQuantity() {
+    var input = document.querySelector('#quantity');
+    var newValue = Number(input.value) - 1;
+    if (newValue < 1) {
+        newValue = 1;
+    } 
+    input.value = newValue;
+}
+
+function plusQuantity() {
+    var input = document.querySelector('#quantity');
+    var newValue = Number(input.value) + 1;
+    const maxValue = Infinity;
+    if (newValue > maxValue) {
+        newValue = maxValue;
+    } 
+    input.value = newValue;
+}

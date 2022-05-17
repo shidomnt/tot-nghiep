@@ -1,3 +1,27 @@
+<?php 
+session_start();
+include './src/connect.php';
+include './src/control.php';
+include './src/product.php';
+include './src/cart.php';
+if (isset($_POST['signup'])) {
+  $data = new Data();
+  $result = $data->register(
+    $_POST['firstname'],
+    $_POST['lastname'],
+    $_POST['sex'],
+    $_POST['birthday'],
+    $_POST['email'],
+    $_POST['password']
+  );
+  if ($result) {
+    header('Location: signin.php', true, 303);
+  } else {
+    echo '<script>alert("Đăng kí thất bại! Email đã được sử dụng!")</script>';
+  }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,47 +45,40 @@
 </head>
 
 <body>
-  <div class="header">
-    <a style="color: #ffffff;text-decoration: none;" href="index.html">MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG NỘI THÀNH > 300K
-      - ĐỔI TRẢ TRONG 30 NGÀY - ĐẢM BẢO CHẤT LƯỢNG</a>
-  </div>
 
   <!--Navbar-->
 
   <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
 
     <div class="container">
-      <a class="navbar-brand" href="index.html">
+      <a class="navbar-brand" href="index.php">
         <img src="images/logo.png" class="logo-top" alt="">
       </a>
       <div class="desk-menu collapse navbar-collapse justify-content-md-center" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item ">
-            <a class="nav-link" href="index.html">TRANG CHỦ</a>
+            <a class="nav-link" href="index.php">TRANG CHỦ</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
+            <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
           </li>
           <li class="nav-item lisanpham">
-            <a class="nav-link" href="detailproduct.html">SẢN PHẨM
+            <a class="nav-link" href="detailproduct.php">SẢN PHẨM
               <i class="fa fa-chevron-down" aria-hidden="true"></i>
             </a>
             <ul class="sub_menu">
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 1"> 
-                  Sản phẩm - Style 1
-                </a>
-              </li>
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 2"> 
-                  Sản phẩm - Style 2
-                </a>
-              </li>
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 3"> 
-                  Sản phẩm - Style 3
-                </a>
-              </li>
+              <?php 
+                $result = Product::query('SELECT * FROM products LIMIT 3');
+                while ($product = mysqli_fetch_assoc($result)) {
+                  echo "
+                    <li class=''>
+                      <a href='detailproduct.php?id={$product['id']}' title='{$product['name']}'> 
+                      {$product['name']}
+                      </a>
+                    </li>
+                  ";
+                }
+              ?>
             </ul>
           </li>
           <li class="nav-item">
@@ -88,10 +105,10 @@
             <div class="justify-content-md-center">
               <ul class="navbar-nav">
                 <li class="nav-item">
-                  <a class="nav-link" href="index.html">TRANG CHỦ</a>
+                  <a class="nav-link" href="index.php">TRANG CHỦ</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
+                  <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
                 </li>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle aaaa"  href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
@@ -101,9 +118,9 @@
 
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="border:0;">
-                    <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 1">Sản phẩm - Style 1</a>
-                    <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 2">Sản phẩm - Style 2</a>
-                    <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 3">Sản phẩm - Style 3</a>
+                    <a class="dropdown-item" href="detailproduct.php" title="Sản phẩm - Style 1">Sản phẩm - Style 1</a>
+                    <a class="dropdown-item" href="detailproduct.php" title="Sản phẩm - Style 2">Sản phẩm - Style 2</a>
+                    <a class="dropdown-item" href="detailproduct.php" title="Sản phẩm - Style 3">Sản phẩm - Style 3</a>
                   </div>
                 </li>
                 <li class="nav-item">
@@ -132,49 +149,15 @@
                 margin: 3px 0 30px 0;
                 font-weight: 500; letter-spacing: 2px;">Tìm kiếm</h3>
           <div class="search-box wpo-wrapper-search">
-            <form action="search" class="searchform searchform-categoris ultimate-search">
+            <form action="product.php" class="searchform searchform-categoris ultimate-search">
               <div class="wpo-search-inner" style="display:inline">
-                <input type="hidden" name="type" value="product">
-                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off"
+                <input required="" id="inputSearchAuto" name="search" maxlength="40" autocomplete="off"
                   class="searchinput input-search search-input" type="text" size="20"
                   placeholder="Tìm kiếm sản phẩm...">
               </div>
               <button type="submit" class="btn-search btn" id="search-header-btn">
                 <i style="font-weight:bold" class="fas fa-search"></i>
               </button>
-              <div class="search-item">
-                  <div class="search-item-left">
-                      <div class="item-name">Adidas</div>
-                      <div class="item-price">1.600.000$</div>
-                  </div>
-                  <div class="search-item-right">
-                      <div class="img">
-                          <img src="images/shoes/1.jpg" alt="">
-                      </div>
-                  </div>
-              </div>
-              <div class="search-item">
-                <div class="search-item-left">
-                    <div class="item-name">Adidas</div>
-                    <div class="item-price">1.600.000$</div>
-                </div>
-                <div class="search-item-right">
-                    <div class="img">
-                        <img src="images/shoes/1.jpg" alt="">
-                    </div>
-                </div>
-            </div>
-            <div class="search-item">
-                <div class="search-item-left">
-                    <div class="item-name">Adidas</div>
-                    <div class="item-price">1.600.000$</div>
-                </div>
-                <div class="search-item-right">
-                    <div class="img">
-                        <img src="images/shoes/1.jpg" alt="">
-                    </div>
-                </div>
-            </div>
             </form>
             <div id="ajaxSearchResults" class="smart-search-wrapper ajaxSearchResults" style="display: none">
               <div class="resultsContent"></div>
@@ -196,38 +179,44 @@
           <div class="site-nav-container-last" style="color:#272727">
             <div class="cart-view clearfix">
               <table id="cart-view">
-                <tbody>
-                  <tr class="item_1">
-                    <td class="img"><a href="" title="Nike Air Max 90 Essential &quot;Grape&quot;"><img
-                          src="images/shoes/1.jpg" alt="/products/nike-air-max-90-essential-grape"></a></td>
-                    <td>
-                      <a class="pro-title-view" style="color: #272727" href=""
-                        title="Nike Air Max 90 Essential &quot;Grape&quot;">Nike Air Max 90 Essential "Grape"</a>
-                      <span class="variant">Tím / 36</span>
-                      <span class="pro-quantity-view">1</span>
-                      <span class="pro-price-view">4,800,000₫</span>
-                      <span class="remove_link remove-cart"><a href=""><i style="color: #272727;"
-                            class="fas fa-times"></i></a></span>
-                    </td>
-                  </tr>
+              <tbody>
+                  <?php
+                  $cart = new Cart();
+                  $cart->foreach_product(function ($is_error, $product, $quantity) {
+                    if (!$is_error) {
+                      $totalprice = Product::format_price($product['price'] * $quantity);
+                      echo "<tr class=\"item_1\">
+                        <td class=\"img\"><a href=\"detailproduct.php?id={$product['id']}\" title=\"{$product['name']}\"><img src=\"{$product['imgsrc1']}\" alt=\"{$product['name']}\"></a></td>
+                        <td>
+                          <a class=\"pro-title-view\" style=\"color: #272727\" href=\"javascript:void(0)\" title=\"{$product['name']}\">{$product['name']}</a>
+                          <!-- <span class=\"variant\">Tím / 36</span> -->
+                          <span class=\"pro-quantity-view\">$quantity</span>
+                          <span class=\"pro-price-view\">{$totalprice}₫</span>
+                          <form method='POST'>
+                            <input type=\"hidden\" name=\"action\" value=\"remove\">
+                            <input type=\"hidden\" name=\"id\" value=\"{$product['id']}\">
+                            <span class=\"remove_link remove-cart\"><button style=\"background: none;border: none;\" type=\"submit\" name=\"submit_cart\" value=\"remove\"><i style=\"color: #272727;\" class=\"fas fa-times\"></i></button></span>
+                          </form>
+                          </td>
+                      </tr>";
+                    }
+                  });
+                  ?>
                 </tbody>
               </table>
               <span class="line"></span>
               <table class="table-total">
-                <tbody>
+              <tbody>
                   <tr>
                     <td class="text-left">TỔNG TIỀN:</td>
-                    <td class="text-right" id="total-view-cart">4,800,000₫</td>
+                    <td class="text-right" id="total-view-cart"><?= Product::format_price($cart->total()) ?></td>
                   </tr>
                   <tr>
-                    <td class="distance-td"><a href="" class="linktocart button dark">Xem giỏ hàng</a></td>
-                    <td><a href="" class="linktocheckout button dark">Thanh toán</a></td>
+                    <td class="distance-td"><a href="" class="linktocart button dark" style="color: #fff;">Xem giỏ hàng</a></td>
+                    <td><a href="mail.php" class="linktocheckout button dark <?php echo empty($_SESSION['cart']) ? "disabled" : "" ?>" style="color: #fff;">Thanh toán</a></td>
                   </tr>
                 </tbody>
               </table>
-
-              <a href="" target="_blank" class="button btn-check" style="text-decoration:none;"><span>Click nhận mã giảm
-                  giá ngay !</span></a>
             </div>
           </div>
         </div>
@@ -293,29 +282,12 @@
                         <input required type="password"  name="password" placeholder="Password">
                     </div>
                     <div class="recaptcha form-control1">This site is protected by reCAPTCHA and the Google <a href="">Privacy Policy</a> and <a href="">Terms of Service</a> apply.</div>
-                      <input type="submit" name="signup" value="Đăng kí">
+                      <input class="btn btn-dark" type="submit" name="signup" value="Đăng kí">
                     <div class="backto">
-                      <a href=""><i class="fa fa-long-arrow-alt-left"></i> Quay lại trang chủ</a>
+                      <a href="index.php"><i class="fa fa-long-arrow-alt-left"></i> Quay lại trang chủ</a>
                     </div>
                 </form>
-                <?php 
-                include './src/connect.php';
-                include './src/control.php';
-                if (isset($_POST['signup'])) {
-                  $data = new Data();
-                  $result = $data->register(
-                    $_POST['firstname'],
-                    $_POST['lastname'],
-                    $_POST['sex'],
-                    $_POST['birthday'],
-                    $_POST['email'],
-                    $_POST['password']
-                  );
-                  if ($result) {
-                    echo "<script>window.location.href = 'signin.php'</script>";
-                  }
-                }
-                ?>
+                
             </div>
         </div>
     </section>    
@@ -363,7 +335,7 @@
       </div>
     </section>
     <footer class="main-footer">
-      <div class="container">
+      <!-- <div class="container">
         <div class="">
           <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-3">
@@ -461,7 +433,7 @@
                 href="https://www.facebook.com/henrynguyen202">Powered by HuniBlue</a></p>
           </div>
         </div>
-      </div>
+      </div> -->
     </footer>
   </div>
  

@@ -1,6 +1,11 @@
 <?php
 
 class Product {
+  public static function query(string $sql) {
+    global $conn;
+    $result = mysqli_query($conn, $sql);
+    return $result;
+  }
   public static function is_exist(string $id) {
     $result = self::select("id='$id'");
     if ($result && !mysqli_num_rows($result)) {
@@ -9,12 +14,11 @@ class Product {
     return true;
   }
   public static function select(string $query = '') {
-    global $conn;
     $sql = "SELECT * FROM products";
     if (!empty($query)) {
       $sql .= " WHERE $query";
     }
-    $result = mysqli_query($conn, $sql);
+    $result = self::query($sql);
     return $result;
   }
   public static function format_price(int $price) {

@@ -1,3 +1,10 @@
+<?php 
+session_start();
+include './src/connect.php';
+include './src/control.php';
+include './src/product.php';
+include './src/cart.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,46 +34,43 @@
 </head>
 
 <body>
-  <div class="header">
+  <!-- <div class="header">
     <a style="color: #ffffff;text-decoration: none;" href="index.html">MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG NỘI THÀNH > 300K
       - ĐỔI TRẢ TRONG 30 NGÀY - ĐẢM BẢO CHẤT LƯỢNG</a>
-  </div>
+  </div> -->
 
   <!--Navbar-->
   <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
 
     <div class="container">
-      <a class="navbar-brand" href="index.html">
+      <a class="navbar-brand" href="index.php">
         <img src="images/logo.png" class="logo-top" alt="">
       </a>
       <div class="desk-menu collapse navbar-collapse justify-content-md-center" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="index.html">TRANG CHỦ</a>
-          </li>
           <li class="nav-item">
-            <a class="nav-link" href="product.html">BỘ SƯU TẬP</a>
+            <a class="nav-link" href="index.php">TRANG CHỦ</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#">BỘ SƯU TẬP</a>
           </li>
           <li class="nav-item lisanpham">
-            <a class="nav-link" href="detailproduct.html">SẢN PHẨM
+            <a class="nav-link" href="detailproduct.php">SẢN PHẨM
               <i class="fa fa-chevron-down" aria-hidden="true"></i>
             </a>
             <ul class="sub_menu">
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 1"> 
-                  Sản phẩm - Style 1
-                </a>
-              </li>
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 2"> 
-                  Sản phẩm - Style 2
-                </a>
-              </li>
-              <li class="">
-                <a href="detailproduct.html" title="Sản phẩm - Style 3"> 
-                  Sản phẩm - Style 3
-                </a>
-              </li>
+              <?php 
+                $result = Product::query('SELECT * FROM products LIMIT 3');
+                while ($product = mysqli_fetch_assoc($result)) {
+                  echo "
+                    <li class=''>
+                      <a href='detailproduct.php?id={$product['id']}' title='{$product['name']}'> 
+                      {$product['name']}
+                      </a>
+                    </li>
+                  ";
+                }
+              ?>
             </ul>
           </li>
           <li class="nav-item">
@@ -137,10 +141,9 @@
                 margin: 3px 0 30px 0;
                 font-weight: 500; letter-spacing: 2px;">Tìm kiếm</h3>
           <div class="search-box wpo-wrapper-search">
-            <form action="search" class="searchform searchform-categoris ultimate-search">
+          <form action="product.php" class="searchform searchform-categoris ultimate-search">
               <div class="wpo-search-inner" style="display:inline">
-                <input type="hidden" name="type" value="product">
-                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off"
+                <input required="" id="inputSearchAuto" name="search" maxlength="40" autocomplete="off"
                   class="searchinput input-search search-input" type="text" size="20"
                   placeholder="Tìm kiếm sản phẩm...">
               </div>
@@ -168,7 +171,7 @@
           <div class="site-nav-container-last" style="color:#272727">
             <div class="cart-view clearfix">
               <table id="cart-view">
-                <tbody>
+                <!-- <tbody>
                   <tr class="item_1">
                     <td class="img"><a href="" title="Nike Air Max 90 Essential &quot;Grape&quot;"><img
                           src="images/shoes/1.jpg" alt="/products/nike-air-max-90-essential-grape"></a></td>
@@ -182,11 +185,35 @@
                             class="fas fa-times"></i></a></span>
                     </td>
                   </tr>
+                </tbody> -->
+                <tbody>
+                  <?php
+                  $cart = new Cart();
+                  $cart->foreach_product(function ($is_error, $product, $quantity) {
+                    if (!$is_error) {
+                      $totalprice = Product::format_price($product['price'] * $quantity);
+                      echo "<tr class=\"item_1\">
+                        <td class=\"img\"><a href=\"detailproduct.php?id={$product['id']}\" title=\"{$product['name']}\"><img src=\"{$product['imgsrc1']}\" alt=\"{$product['name']}\"></a></td>
+                        <td>
+                          <a class=\"pro-title-view\" style=\"color: #272727\" href=\"javascript:void(0)\" title=\"{$product['name']}\">{$product['name']}</a>
+                          <!-- <span class=\"variant\">Tím / 36</span> -->
+                          <span class=\"pro-quantity-view\">$quantity</span>
+                          <span class=\"pro-price-view\">{$totalprice}₫</span>
+                          <form method='POST'>
+                            <input type=\"hidden\" name=\"action\" value=\"remove\">
+                            <input type=\"hidden\" name=\"id\" value=\"{$product['id']}\">
+                            <span class=\"remove_link remove-cart\"><button style=\"background: none;border: none;\" type=\"submit\" name=\"submit_cart\" value=\"remove\"><i style=\"color: #272727;\" class=\"fas fa-times\"></i></button></span>
+                          </form>
+                          </td>
+                      </tr>";
+                    }
+                  });
+                  ?>
                 </tbody>
               </table>
               <span class="line"></span>
               <table class="table-total">
-                <tbody>
+                <!-- <tbody>
                   <tr>
                     <td class="text-left">TỔNG TIỀN:</td>
                     <td class="text-right" id="total-view-cart">4,800,000₫</td>
@@ -195,18 +222,28 @@
                     <td class="distance-td"><a href="" class="linktocart button dark">Xem giỏ hàng</a></td>
                     <td><a href="" class="linktocheckout button dark">Thanh toán</a></td>
                   </tr>
+                </tbody> -->
+                <tbody>
+                  <tr>
+                    <td class="text-left">TỔNG TIỀN:</td>
+                    <td class="text-right" id="total-view-cart"><?= Product::format_price($cart->total()) ?></td>
+                  </tr>
+                  <tr>
+                    <td class="distance-td"><a href="" class="linktocart button dark" style="color: #fff;">Xem giỏ hàng</a></td>
+                    <td><a href="mail.php" class="linktocheckout button dark <?php echo empty($_SESSION['cart']) ? "disabled" : "" ?>" style="color: #fff;">Thanh toán</a></td>
+                  </tr>
                 </tbody>
               </table>
 
-              <a href="" target="_blank" class="button btn-check" style="text-decoration:none;"><span>Click nhận mã giảm
-                  giá ngay !</span></a>
+              <!-- <a href="" target="_blank" class="button btn-check" style="text-decoration:none;"><span>Click nhận mã giảm
+                  giá ngay !</span></a> -->
             </div>
           </div>
         </div>
       </div>
 
       <div class="icon-ol">
-        <a style="color: #272727" href="">
+        <a style="color: #272727" href="profile.php">
           <i class="fas fa-user-alt"></i>
         </a>
         <a href="#" class="" uk-toggle="target: #offcanvas-flip">
@@ -237,12 +274,12 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pd5">
           <ol class="breadcrumb breadcrumb-arrows">
             <li>
-              <a href="index.html">
+              <a href="index.php">
                 <span>Trang chủ</span>
               </a>
             </li>
             <li>
-              <a href="Product.html">
+              <a href="#">
                 <span>Danh mục</span>
               </a>
             </li>
@@ -274,8 +311,8 @@
                   <div class="block_content layered-category collapse" id="collapseExample1">
                     <div class="layered-content card card-body"  style="border:0;padding:0">
                       <ul class="menuList-links">
-                        <li class=""><a href="home.html" title="Trang chủ"><span>Trang chủ</span></a></li>
-                        <li class=" active "><a href="product.html" title="Bộ sưu tập"><span>Bộ sưu tập</span></a>
+                        <li class=""><a href="index.php" title="Trang chủ"><span>Trang chủ</span></a></li>
+                        <li class=" active "><a href="#" title="Bộ sưu tập"><span>Bộ sưu tập</span></a>
                         </li>
                         <li class="has-submenu level0 ">
                           <a title="Sản phẩm" >Sản phẩm<span class="icon-plus-submenu" data-toggle="collapse"
@@ -284,9 +321,18 @@
                           <div class="collapse" id="collapseExample">
                             <div class="card card-body" style="border:0;padding-top:0;">
                               <ul class="menu-product">
-                                <li><a href="detailproduct.html" title="Sản phẩm - Style 1">Sản phẩm - Style 1</a></li>
-                                <li><a href="detailproduct.html" title="Sản phẩm - Style 2">Sản phẩm - Style 2</a></li>
-                                <li><a href="detailproduct.html" title="Sản phẩm - Style 3">Sản phẩm - Style 3</a></li>
+                                <?php 
+                                  $result = Product::query('SELECT * FROM products LIMIT 3');
+                                  while ($product = mysqli_fetch_assoc($result)) {
+                                    echo "
+                                      <li class=''>
+                                        <a href='detailproduct.php?id={$product['id']}' title='{$product['name']}'> 
+                                        {$product['name']}
+                                        </a>
+                                      </li>
+                                    ";
+                                  }
+                                ?>
                               </ul>
                             </div>
                           </div>
@@ -298,7 +344,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="layered">
+                <!-- <div class="layered">
                   <p class="title_block d-block d-sm-none d-none d-sm-block d-md-none" data-toggle="collapse"
                   href="#collapseExample2" role="button" aria-expanded="false"
                   aria-controls="collapseExample2">
@@ -454,7 +500,7 @@
 
                   </div>
 
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -470,7 +516,7 @@
           </div>
           <div class="col-md-4 d-sm-none d-md-block d-none d-sm-block" style="float: left">
             <div class="option browse-tags">
-              <span class="custom-dropdown custom-dropdown--grey">
+              <!-- <span class="custom-dropdown custom-dropdown--grey">
                 <select class="sort-by custom-dropdown__select">
                   <option value="price-ascending">Giá: Tăng dần</option>
                   <option value="price-descending">Giá: Giảm dần
@@ -485,16 +531,16 @@
                   </option>
                   <option value="quantity-descending">Tồn kho: Giảm dần</option>
                 </select>
-              </span>
+              </span> -->
             </div>
           </div>
         </div>
         <div class="row">
           <?php 
-          include './src/connect.php';
-          include './src/control.php';
-          include './src/product.php';
-          $result = Product::select();
+          if (!empty($_GET['search'])) {
+            $query = "name LIKE '%{$_GET['search']}%'";
+          }
+          $result = Product::select(isset($query) ? $query : '');
           while ($row = mysqli_fetch_assoc($result)) {
             $price = Product::format_price($row['price']);
             echo "<div class=\"col-md-3 col-sm-6 col-xs-6 col-6\">
@@ -589,7 +635,7 @@
     </div>
   </section>
   <footer class="main-footer">
-    <div class="container">
+    <!-- <div class="container">
       <div class="">
         <div class="row">
           <div class="col-xs-12 col-sm-6 col-md-3">
@@ -687,7 +733,7 @@
               href="https://www.facebook.com/henrynguyen202">Powered by HuniBlue</a></p>
         </div>
       </div>
-    </div>
+    </div> -->
   </footer>
   <script async defer crossorigin="anonymous" src="plugins/sdk.js"></script>
   <script src="plugins/jquery-3.4.1/jquery-3.4.1.min.js"></script>

@@ -37,7 +37,8 @@ try {
   $mail->MsgHTML($content);
   $mail->send();
   unset($_SESSION['cart']);
-  header("Location: {$_SERVER['HTTP_REFERER']}", true, 303);
+  $_SESSION['mail_success'] = 1;
+  header("Location: success_order.php", true, 303);
 } catch (Exception $e) {
   echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
 }

@@ -14,7 +14,7 @@ class Cart {
     if (!$is_exist) {
       $_SESSION['cart'][$id] = $quantity;
     } else {
-      // $_SESSION['cart'][$id] += 1;
+      $_SESSION['cart'][$id] += $quantity;
     }
     return $_SESSION['cart'];
   }

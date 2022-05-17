@@ -10,9 +10,9 @@ if (empty($_GET['id']) || !Product::is_exist($_GET['id'])) {
   exit();
 }
 
-// Bat dau cart
 $result_list_product = Product::select("id={$_GET['id']}");
 $product = mysqli_fetch_assoc($result_list_product);
+// Bat dau cart
 $cart = new Cart();
 
 if (isset($_POST['submit_cart'])) {
@@ -34,6 +34,7 @@ if (isset($_POST['submit_cart'])) {
   }
 }
 // Ket thuc cart
+
 ?>
 
 <html class="no-js" lang="vi">
@@ -60,22 +61,9 @@ if (isset($_POST['submit_cart'])) {
   <!-- UIkit CSS -->
   <link rel="stylesheet" href="plugins/uikit/uikit.min.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css">
-  <style>
-    a.disabled {
-  pointer-events: none;
-  cursor: not-allowed;
-  user-select: none;
-  opacity: 0.5;
-}
-  </style>
 </head>
 
 <body>
-  <div class="header">
-    <a style="color: #ffffff;text-decoration: none;" href="index.html">MIỄN PHÍ
-      VẬN CHUYỂN VỚI ĐƠN HÀNG NỘI THÀNH > 300K
-      - ĐỔI TRẢ TRONG 30 NGÀY - ĐẢM BẢO CHẤT LƯỢNG</a>
-  </div>
 
   <!--Navbar-->
 
@@ -87,17 +75,17 @@ if (isset($_POST['submit_cart'])) {
       </a>
       <div class="desk-menu collapse navbar-collapse justify-content-md-center" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="index.html">TRANG CHỦ</a>
+          <li class="nav-item">
+            <a class="nav-link" href="index.php">TRANG CHỦ</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
+            <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
           </li>
-          <li class="nav-item lisanpham">
-            <a class="nav-link" href="detailproduct.html">SẢN PHẨM
+          <li class="nav-item active lisanpham">
+            <a class="nav-link " href="detailproduct.php">SẢN PHẨM
               <i class="fa fa-chevron-down" aria-hidden="true"></i>
             </a>
-            <ul class="sub_menu">
+            <!-- <ul class="sub_menu">
               <li class="">
                 <a href="detailproduct.html" title="Sản phẩm - Style 1">
                   Sản phẩm - Style 1
@@ -113,6 +101,20 @@ if (isset($_POST['submit_cart'])) {
                   Sản phẩm - Style 3
                 </a>
               </li>
+            </ul> -->
+            <ul class="sub_menu">
+              <?php 
+                $r = Product::query('SELECT * FROM products LIMIT 3');
+                while ($prod = mysqli_fetch_assoc($r)) {
+                  echo "
+                    <li class=''>
+                      <a href='detailproduct.php?id={$prod['id']}' title='{$prod['name']}'> 
+                      {$prod['name']}
+                      </a>
+                    </li>
+                  ";
+                }
+              ?>
             </ul>
           </li>
           <li class="nav-item">
@@ -182,10 +184,11 @@ if (isset($_POST['submit_cart'])) {
                   margin: 3px 0 30px 0;
                   font-weight: 500; letter-spacing: 2px;">Tìm kiếm</h3>
           <div class="search-box wpo-wrapper-search">
-            <form action="search" class="searchform searchform-categoris ultimate-search">
+          <form action="product.php" class="searchform searchform-categoris ultimate-search">
               <div class="wpo-search-inner" style="display:inline">
-                <input type="hidden" name="type" value="product">
-                <input required="" id="inputSearchAuto" name="q" maxlength="40" autocomplete="off" class="searchinput input-search search-input" type="text" size="20" placeholder="Tìm kiếm sản phẩm...">
+                <input required="" id="inputSearchAuto" name="search" maxlength="40" autocomplete="off"
+                  class="searchinput input-search search-input" type="text" size="20"
+                  placeholder="Tìm kiếm sản phẩm...">
               </div>
               <button type="submit" class="btn-search btn" id="search-header-btn">
                 <i style="font-weight:bold" class="fas fa-search"></i>
@@ -257,9 +260,8 @@ if (isset($_POST['submit_cart'])) {
         </div>
       </div>
 
-
       <div class="icon-ol">
-        <a style="color: #272727" href="">
+        <a style="color: #272727" href="profile.php">
           <i class="fas fa-user-alt"></i>
         </a>
         <a href="#" class="" uk-toggle="target: #offcanvas-flip">
@@ -289,18 +291,18 @@ if (isset($_POST['submit_cart'])) {
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pd5">
               <ol class="breadcrumb breadcrumb-arrows">
                 <li>
-                  <a href="home.html">
+                  <a href="index.php">
                     <span">Trang chủ</span>
                   </a>
                 </li>
                 <li>
-                  <a href="">
+                  <a href="product.php">
                     <span>Sản phẩm</span>
                   </a>
                 </li>
                 <li class="active">
                   <span>
-                    <span itemprop="name">Nike Air Max 90</span>
+                    <span itemprop="name"><?php echo $product['name']; ?></span>
                   </span>
                   <meta itemprop="position" content="3">
                 </li>
@@ -480,7 +482,7 @@ if (isset($_POST['submit_cart'])) {
               <div class="product-content-desc-1">
                 <div class="product-title">
                   <h1><?= $product['name'] ?></h1>
-                  <span id="pro_sku">SKU: S-0015-1</span>
+                  <span id="pro_sku">SKU: S-0015-<?php echo $product['id']; ?></span>
                 </div>
                 <div class="product-price" id="price-preview"><span class="pro-price"><?php echo Product::format_price($product['price']); ?>₫</span></div>
                 <form id="add-item-form" method="POST" class="variants clearfix">
@@ -657,94 +659,39 @@ if (isset($_POST['submit_cart'])) {
             </div>
             <div class="container">
               <div class="row">
-                <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-                  <div class="product-block">
-                    <div class="product-img fade-box">
-                      <a href="#" title="Adidas EQT Cushion ADV" class="img-resize">
-                        <img src="images/shoes/800502_01_e92c3b2bb8764b52a791846d84a3a360_grande.jpg" alt="Adidas EQT Cushion ADV" class="lazyloaded">
-                        <img src="images/shoes/shoes fade 1.jpg" alt="Adidas EQT Cushion ADV" class="lazyloaded">
-                      </a>
-
-                    </div>
-                    <div class="product-detail clearfix">
-                      <div class="pro-text">
-                        <a style="color: black;
-                            font-size: 14px;text-decoration: none;" href="#" title="Adidas EQT Cushion ADV" inspiration pack>
-                          Adidas EQT Cushion ADV "North America"
-                        </a>
-                      </div>
-                      <div class="pro-price">
-                        <p class="">7,000,000₫</p>
-                      </div>
-                    </div>
-                  </div>
+              <?php 
+          $r = Product::query('SELECT * FROM products LIMIT 4');
+          while ($prod = mysqli_fetch_assoc($r)) {
+            $price = Product::format_price($prod['price']);
+            echo "<div class=\"col-md-3 col-sm-6 col-xs-6 col-6\">
+            <div class=\"product-block\">
+              <div class=\"product-img fade-box\">
+                <a href=\"detailproduct.php?id={$prod['id']}\" title=\"{$prod['name']}\" class=\"img-resize\">
+                  <img
+                    src=\"{$prod['imgsrc1']}\"
+                    alt=\"{$prod['name']}\" class=\"lazyloaded\">
+                  <img
+                    src=\"{$prod['imgsrc2']}\"
+                    alt=\"{$prod['name']}\" class=\"lazyloaded\">
+                </a>
+                
+              </div>
+              <div class=\"product-detail clearfix\">
+                <div class=\"pro-text\">
+                  <a style=\" color: black;
+                                                          font-size: 14px;text-decoration: none;\" href=\"#\"
+                    title=\"{$prod['name']}\" inspiration pack>
+                    {$prod['name']}
+                  </a>
                 </div>
-                <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-                  <div class="product-block">
-                    <div class="product-img fade-box">
-                      <a href="#" title="Adidas Nmd R1" class="img-resize">
-                        <img src="images/shoes/201493_1_017364c87c3e4802a8cda5259e3d5a95_grande.jpg" alt="Adidas Nmd R1" class="lazyloaded">
-                        <img src="images/shoes/shoes fade 2.jpg" alt="Adidas Nmd R1" class="lazyloaded">
-                      </a>
-
-                    </div>
-                    <div class="product-detail clearfix">
-                      <div class="pro-text">
-                        <a style="color: black;
-                            font-size: 14px;text-decoration: none;" title="Adidas Nmd R1" href="">
-                          Adidas Nmd R1 "Villa Exclusive"
-                        </a>
-                      </div>
-                      <div class="pro-price">
-                        <p class="">7,000,000₫</p>
-                      </div>
-                    </div>
-                  </div>
+                <div class=\"pro-price\">
+                  <p>{$price}₫</p>
                 </div>
-                <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-                  <div class="product-block">
-                    <div class="product-img fade-box">
-                      <a href="#" title="Adidas PW Solar HU NMD" class="img-resize">
-                        <img src="images/shoes/805266_02_b8b2cdd1782246febf8879a44a7e5021_grande.jpg" alt="Adidas PW Solar HU NMD" class="lazyloaded">
-                        <img src="images/shoes/shoes fade 3.jpg" alt="Adidas PW Solar HU NMD" class="lazyloaded">
-                      </a>
-
-                    </div>
-                    <div class="product-detail clearfix">
-                      <div class="pro-text">
-                        <a style="color: black;
-                            font-size: 14px;text-decoration: none;" href="#" title="Adidas PW Solar HU NMD" inspiration pack>
-                          Adidas PW Solar HU NMD "Inspiration Pack"
-                        </a>
-                      </div>
-                      <div class="pro-price">
-                        <p class="">5,000,000₫</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-3 col-sm-6 col-xs-6 col-6">
-                  <div class="product-block">
-                    <div class="product-img fade-box">
-                      <a href="#" title="Adidas Ultraboost W" class="img-resize">
-                        <img src="images/shoes/801432_01_b16d089f8bda434bacfe4620e8480be1_grande.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                        <img src="images/shoes/shoes fade 4.jpg" alt="Adidas Ultraboost W" class="lazyloaded">
-                      </a>
-
-                    </div>
-                    <div class="product-detail clearfix">
-                      <div class="pro-text">
-                        <a style="color: black;
-                            font-size: 14px;text-decoration: none;" href="#" title="Adidas Ultraboost W" inspiration pack>
-                          Adidas Ultraboost W
-                        </a>
-                      </div>
-                      <div class="pro-price">
-                        <p class="">5,300,000₫</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              </div>
+            </div>
+          </div>";
+          }
+          ?>
               </div>
             </div>
           </div>
@@ -838,105 +785,7 @@ if (isset($_POST['submit_cart'])) {
   <!-- footer -->
 
   <footer class="main-footer">
-    <div class="container">
-      <div class="">
-        <div class="row">
-          <div class="col-xs-12 col-sm-6 col-md-3">
-            <div class="footer-col footer-block">
-              <h4 class="footer-title">
-                Giới thiệu
-              </h4>
-              <div class="footer-content">
-                <p>Runner Inn trang mua sắm trực tuyến của thương hiệu giày,
-                  thời trang nam, nữ, phụ kiện, giúp bạn
-                  tiếp
-                  cận xu hướng thời trang mới nhất.</p>
-                <div class="logo-footer">
-                  <img src="images/logo-bct.png" alt="Bộ Công Thương">
-                </div>
-                <div class="social-list">
-                  <a href="#" class="fab fa-facebook"></a>
-                  <a href="#" class="fab fa-google"></a>
-                  <a href="#" class="fab fa-twitter"></a>
-                  <a href="#" class="fab fa-youtube"></a>
-                  <a href="#" class="fab fa-skype"></a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xs-12 col-sm-6 col-md-3">
-            <div class="footer-col footer-link">
-              <h4 class="footer-title">
-                PHÁP LÝ &amp; CÂU HỎI
-              </h4>
-              <div class="footer-content toggle-footer">
-                <ul>
-                  <li class="item">
-                    <a href="#" title="Tìm kiếm">Tìm kiếm</a>
-                  </li>
-                  <li class="item">
-                    <a href="#" title="Giới thiệu">Giới thiệu</a>
-                  </li>
-                  <li class="item">
-                    <a href="#" title="Chính sách đổi trả">Chính sách đổi trả</a>
-                  </li>
-                  <li class="item">
-                    <a href="#" title="Chính sách bảo mật">Chính sách bảo mật</a>
-                  </li>
-                  <li class="item">
-                    <a href="#" title="Điều khoản dịch vụ">Điều khoản dịch vụ</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="col-xs-12 col-sm-6 col-md-3">
-            <div class="footer-col footer-block">
-              <h4 class="footer-title">
-                Thông tin liên hệ
-              </h4>
-              <div class="footer-content toggle-footer">
-                <ul>
-                  <li><span>Địa chỉ:</span> 117-119 Lý Chính Thắng, Phường 7,
-                    Quận 3, TP. Hồ Chí Minh, Vietnam</li>
-                  <li><span>Điện thoại:</span> +84 (028) 38800659</li>
-                  <li><span>Fax:</span> +84 (028) 38800659</li>
-                  <li><span>Mail:</span> contact@aziworld.com</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="col-xs-12 col-sm-6 col-md-3">
-            <div class="footer-col footer-block">
-              <h4 class="footer-title">
-                FANPAGE
-              </h4>
-              <div class="footer-content">
-                <div id="fb-root">
-                  <div class="footer-static-content">
-                    <div class="fb-page" data-href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/" data-tabs="timeline" data-width="" data-height="215" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
-                      <blockquote cite="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/">AziWorld
-                          Viet Nam</a>
-                      </blockquote>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="main-footer--copyright">
-      <div class="container">
-        <hr>
-        <div class="main-footer--border" style="text-align:center;padding-bottom: 15px;">
-          <p>Copyright © 2019 <a href="https://runner-inn.myharavan.com">
-              Runner Inn</a>. <a target="_blank" href="https://www.facebook.com/henrynguyen202">Powered by
-              HuniBlue</a></p>
-        </div>
-      </div>
-    </div>
+    
   </footer>
   <script async defer crossorigin="anonymous" src="plugins/sdk.js"></script>
   <script src="plugins/jquery-3.4.1/jquery-3.4.1.min.js"></script>
@@ -948,7 +797,6 @@ if (isset($_POST['submit_cart'])) {
   <script src="plugins/uikit/uikit-icons.min.js"></script>
   <script src="js/script.js"></script>
   <script src="js/home.js"></script>
-
   <!-- <script src="js/divzoom.js"></script> -->
 </body>
 
