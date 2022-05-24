@@ -70,7 +70,7 @@ if (isset($_POST['submit_cart'])) {
   <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
 
     <div class="container">
-      <a class="navbar-brand" href="index.html">
+      <a class="navbar-brand" href="index.php">
         <img src="images/logo.png" class="logo-top" alt="">
       </a>
       <div class="desk-menu collapse navbar-collapse justify-content-md-center" id="navbarNav">
@@ -131,35 +131,19 @@ if (isset($_POST['submit_cart'])) {
             margin: 3px 0 30px 0;
             font-weight: 500; letter-spacing: 2px;">MENU</h3>
           <div class="justify-content-md-center">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" href="index.html">TRANG CHỦ</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="Product.html">BỘ SƯU TẬP</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle aaaa" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <p>SẢN PHẨM</p>
-                  <i class="fa fa-angle-double-right"></i>
-
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="border:0;">
-                  <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 1">Sản phẩm - Style 1</a>
-                  <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 2">Sản phẩm - Style 2</a>
-                  <a class="dropdown-item" href="detailproduct.html" title="Sản phẩm - Style 3">Sản phẩm - Style 3</a>
-                </div>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="introduce.html">GIỚI THIỆU</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="blog.html">BLOG</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="Contact.html">LIÊN HỆ</a>
-              </li>
-            </ul>
+          <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="index.php">TRANG CHỦ</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="product.php" role="button" aria-haspopup="true" aria-expanded="false">
+                    SẢN PHẨM
+                  </a>
+                </li>
+              </ul>
           </div>
 
         </div>

@@ -55,34 +55,19 @@ if (!isset($_SESSION['user'])) {
         <img src="images/logo.png" class="logo-top" alt="">
       </a>
       <div class="desk-menu collapse navbar-collapse justify-content-md-center" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item ">
-            <a class="nav-link" href="index.php">TRANG CHỦ</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
-          </li>
-          <li class="nav-item lisanpham">
-            <a class="nav-link" href="detailproduct.php">SẢN PHẨM
-              <i class="fa fa-chevron-down" aria-hidden="true"></i>
-            </a>
-            <ul class="sub_menu">
-              <?php 
-                $result = Product::query('SELECT * FROM products LIMIT 3');
-                while ($product = mysqli_fetch_assoc($result)) {
-                  echo "
-                    <li class=''>
-                      <a href='detailproduct.php?id={$product['id']}' title='{$product['name']}'> 
-                      {$product['name']}
-                      </a>
-                    </li>
-                  ";
-                }
-              ?>
-            </ul>
-          </li>
-          
-        </ul>
+      <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="index.php">TRANG CHỦ</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="product.php">BỘ SƯU TẬP</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="product.php" role="button" aria-haspopup="true" aria-expanded="false">
+                    SẢN PHẨM
+                  </a>
+                </li>
+              </ul>
       </div>
       <div id="offcanvas-flip1" uk-offcanvas="flip: true; overlay: true">
         <div class="uk-offcanvas-bar" style="background: white;
