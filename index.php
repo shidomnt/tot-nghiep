@@ -41,7 +41,7 @@ $_SESSION['mail_success'] = 0;
   <link rel="stylesheet" href="css/owl.theme.default.min.css" type="text/css">
   <link rel="stylesheet" type="text/css" href="css/style.css">
 
-  <!-- UIkit CSS -->
+  
   <link rel="stylesheet" href="plugins/uikit/uikit.min.css" />
 
   <title>Runner</title>
@@ -49,12 +49,7 @@ $_SESSION['mail_success'] = 0;
 </head>
 
 <body>
-  <!-- <div class="header">
-    <a style="color: #ffffff;text-decoration: none;" href="index.html">MIỄN PHÍ VẬN CHUYỂN VỚI ĐƠN HÀNG NỘI THÀNH > 300K
-      - ĐỔI TRẢ TRONG 30 NGÀY - ĐẢM BẢO CHẤT LƯỢNG</a>
-  </div> -->
-
-  <!--Navbar-->
+  
 
   <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
 
@@ -89,15 +84,7 @@ $_SESSION['mail_success'] = 0;
               ?>
             </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="introduce.html">GIỚI THIỆU</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="blog.html">BLOG</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="contact.html">LIÊN HỆ</a>
-          </li>
+          
         </ul>
       </div>
       <div id="offcanvas-flip1" uk-offcanvas="flip: true; overlay: true">
@@ -187,21 +174,7 @@ $_SESSION['mail_success'] = 0;
           <div class="site-nav-container-last" style="color:#272727">
             <div class="cart-view clearfix">
               <table id="cart-view">
-                <!-- <tbody>
-                  <tr class="item_1">
-                    <td class="img"><a href="" title="Nike Air Max 90 Essential &quot;Grape&quot;"><img
-                          src="images/shoes/1.jpg" alt="/products/nike-air-max-90-essential-grape"></a></td>
-                    <td>
-                      <a class="pro-title-view" style="color: #272727" href=""
-                        title="Nike Air Max 90 Essential &quot;Grape&quot;">Nike Air Max 90 Essential "Grape"</a>
-                      <span class="variant">Tím / 36</span>
-                      <span class="pro-quantity-view">1</span>
-                      <span class="pro-price-view">4,800,000₫</span>
-                      <span class="remove_link remove-cart"><a href=""><i style="color: #272727;"
-                            class="fas fa-times"></i></a></span>
-                    </td>
-                  </tr>
-                </tbody> -->
+                
                 <tbody>
                   <?php
                   $cart->foreach_product(function ($is_error, $product, $quantity) {
@@ -228,16 +201,7 @@ $_SESSION['mail_success'] = 0;
               </table>
               <span class="line"></span>
               <table class="table-total">
-                <!-- <tbody>
-                  <tr>
-                    <td class="text-left">TỔNG TIỀN:</td>
-                    <td class="text-right" id="total-view-cart">4,800,000₫</td>
-                  </tr>
-                  <tr>
-                    <td class="distance-td"><a href="" class="linktocart button dark">Xem giỏ hàng</a></td>
-                    <td><a href="" class="linktocheckout button dark">Thanh toán</a></td>
-                  </tr>
-                </tbody> -->
+                
                 <tbody>
                   <tr>
                     <td class="text-left">TỔNG TIỀN:</td>
@@ -250,8 +214,7 @@ $_SESSION['mail_success'] = 0;
                 </tbody>
               </table>
 
-              <!-- <a href="" target="_blank" class="button btn-check" style="text-decoration:none;"><span>Click nhận mã giảm
-                  giá ngay !</span></a> -->
+              
             </div>
           </div>
         </div>
@@ -277,13 +240,13 @@ $_SESSION['mail_success'] = 0;
     </div>
 
   </nav>
-  <!-- Owl-Carousel -->
+  
   <div class="owl-carousel owl-theme owl-carousel-setting">
     <div class="item"><img src="images/slideshow_1.jpg" class="d-block w-100" alt="..."></div>
     <div class="item"><img src="images/slideshow_2.jpg" class="d-block w-100" alt="..."></div>
 </div>
  
-  <!--Content-->
+  
   <div class="content">
     <div class="container">
       <div class="hot_sp" style="padding-bottom: 10px;">
@@ -295,7 +258,7 @@ $_SESSION['mail_success'] = 0;
         </div>
       </div>
     </div>
-    <!--Product-->
+    
     <div class="container" style="padding-bottom: 50px;">
       <div class="row">
         <?php 
@@ -475,114 +438,7 @@ $_SESSION['mail_success'] = 0;
       </div>
       </div>
     </section>
-    <!-- <section class="">
-      <div class="content">
-        <div class="container">
-          <div class="hot_sp">
-            <h2 style="text-align:center;padding-top: 10px">
-              <a style="font-size: 28px;color: black;text-decoration: none" href="">Bài viết mới nhất</a>
-            </h2>
-            <br />
-          </div>
-        </div>
-      </div>
-      <div>
-
-        <div class="container">
-
-          <div class="row">
-            <div class="col-md-4">
-              <div class="post_item">
-                <div class="post_featured">
-                  <a href="#" title="Adidas EQT Cushion ADV">
-                    <img class="img-resize" style="padding-bottom:15px;" src="images/shoes/new-1.jpg"
-                      alt="Adidas Falcon nổi bật mùa Hè với phối màu color block">
-                  </a>
-                </div>
-                <div class="pro-text">
-                  <span class="post_info_item">
-
-                    Thứ Ba 11,06,2019
-
-                  </span>
-                </div>
-                <div class="pro-text">
-                  <h3 class="post_title">
-                    <a style=" color: black;
-                                  font-size: 18px;text-decoration: none;" href="#" inspiration pack>
-                      Adidas Falcon nổi bật mùa Hè với phối màu color block
-                    </a>
-                  </h3>
-                </div>
-                <div style="text-align:center; padding-bottom: 30px;">
-                  <span>Cuối tháng 5, adidas Falcon đã cho ra mắt nhiều phối màu đón chào mùa Hè khiến giới trẻ yêu
-                    thích không thôi. Tưởng chừng thương hiệu sẽ tiếp tục...</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="post_item">
-                <div class="post_featured">
-                  <a href="#" title="Adidas EQT Cushion ADV">
-                    <img class="img-resize" style="padding-bottom:15px;" src="images/shoes/new-2.jpg"
-                      alt="Saucony hồi sinh mẫu giày chạy bộ cổ điển của mình – Aya Runner">
-                  </a>
-                </div>
-                <div class="pro-text">
-                  <span class="post_info_item">
-
-                    Thứ Ba 11,06,2019
-
-                  </span>
-                </div>
-                <div class="pro-text">
-                  <h3 class="post_title">
-                    <a style=" color: black;
-                                                  font-size: 18px;text-decoration: none;" href="#" inspiration pack>
-                      Saucony hồi sinh mẫu giày chạy bộ cổ điển của mình – Aya Runner
-                    </a>
-                  </h3>
-                </div>
-                <div style="text-align:center; padding-bottom: 30px;">
-                  <span>Là một trong những đôi giày chạy bộ tốt nhất vào những năm 1994, 1995, Saucony Aya Runner vừa có
-                    màn trở lại
-                    vô cùng ấn tượngCó vẻ như 2019...</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="post_item">
-                <div class="post_featured">
-                  <a href="#" title="Adidas EQT Cushion ADV">
-                    <img class="img-resize" style="padding-bottom:15px;" src="images/shoes/new-3.jpg"
-                      alt="Nike Vapormax Plus trở lại với sắc tím mộng mơ và thiết kế chuyển màu đẹp mắt">
-                  </a>
-                </div>
-                <div class="pro-text">
-                  <span class="post_info_item">
-
-                    Thứ Ba 11,06,2019
-
-                  </span>
-                </div>
-                <div class="pro-text">
-                  <h3 class="post_title">
-                    <a style=" color: black;
-                                      font-size: 18px;text-decoration: none;" href="#" inspiration pack>
-                      Nike Vapormax Plus trở lại với sắc tím mộng mơ và thiết kế chuyển màu đẹp mắt
-                    </a>
-                  </h3>
-                </div>
-                <div style="text-align:center; padding-bottom: 30px;">
-                  <span>Là một trong những mẫu giày retro có nhiều phối màu gradient đẹp nhất từ trước đến này, Nike
-                    Vapormax Plus vừa có màn trở lại bá đạo dành cho...</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section> -->
+    
     <section class="section wrapper-home-newsletter">
       <div class="container-fluid">
         <div class="content-newsletter">
@@ -647,105 +503,7 @@ $_SESSION['mail_success'] = 0;
       </div>
     </section>
     <footer class="main-footer">
-      <!-- <div class="container">
-        <div class="">
-          <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-3">
-              <div class="footer-col footer-block">
-                <h4 class="footer-title">
-                  Giới thiệu
-                </h4>
-                <div class="footer-content">
-                  <p>Runner Inn trang mua sắm trực tuyến của thương hiệu giày, thời trang nam, nữ, phụ kiện, giúp bạn
-                    tiếp
-                    cận xu hướng thời trang mới nhất.</p>
-                  <div class="logo-footer">
-                    <img src="images/logo-bct.png" alt="Bộ Công Thương">
-                  </div>
-                  <div class="social-list">
-                    <a href="#" class="fab fa-facebook"></a>
-                    <a href="#" class="fab fa-google"></a>
-                    <a href="#" class="fab fa-twitter"></a>
-                    <a href="#" class="fab fa-youtube"></a>
-                    <a href="#" class="fab fa-skype"></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-3">
-              <div class="footer-col footer-link">
-                <h4 class="footer-title">
-                  PHÁP LÝ &amp; CÂU HỎI
-                </h4>
-                <div class="footer-content toggle-footer">
-                  <ul>
-                    <li class="item">
-                      <a href="#" title="Tìm kiếm">Tìm kiếm</a>
-                    </li>
-                    <li class="item">
-                      <a href="#" title="Giới thiệu">Giới thiệu</a>
-                    </li>
-                    <li class="item">
-                      <a href="#" title="Chính sách đổi trả">Chính sách đổi trả</a>
-                    </li>
-                    <li class="item">
-                      <a href="#" title="Chính sách bảo mật">Chính sách bảo mật</a>
-                    </li>
-                    <li class="item">
-                      <a href="#" title="Điều khoản dịch vụ">Điều khoản dịch vụ</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-3">
-              <div class="footer-col footer-block">
-                <h4 class="footer-title">
-                  Thông tin liên hệ
-                </h4>
-                <div class="footer-content toggle-footer">
-                  <ul>
-                    <li><span>Địa chỉ:</span> 117-119 Lý Chính Thắng, Phường 7, Quận 3, TP. Hồ Chí Minh, Vietnam</li>
-                    <li><span>Điện thoại:</span> +84 (028) 38800659</li>
-                    <li><span>Fax:</span> +84 (028) 38800659</li>
-                    <li><span>Mail:</span> contact@aziworld.com</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-3">
-              <div class="footer-col footer-block">
-                <h4 class="footer-title">
-                  FANPAGE
-                </h4>
-                <div class="footer-content">
-                  <div id="fb-root">
-                    <div class="footer-static-content">
-                      <div class="fb-page" data-href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/"
-                        data-tabs="timeline" data-width="" data-height="215" data-small-header="false"
-                        data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
-                        <blockquote cite="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/"
-                          class="fb-xfbml-parse-ignore"><a
-                            href="https://www.facebook.com/AziWorld-Viet-Nam-908555669481794/">AziWorld Viet Nam</a>
-                        </blockquote>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="main-footer--copyright">
-        <div class="container">
-          <hr>
-          <div class="main-footer--border" style="text-align:center;padding-bottom: 15px;">
-            <p>Copyright © 2019 <a href="https://runner-inn.myharavan.com"> Runner Inn</a>. <a target="_blank"
-                href="https://www.facebook.com/henrynguyen202">Powered by HuniBlue</a></p>
-          </div>
-        </div>
-      </div> -->
+      
     </footer>
   </div>
   <div class="registratior_custom">
@@ -774,7 +532,7 @@ $_SESSION['mail_success'] = 0;
   </div>
   <script async defer crossorigin="anonymous" src="plugins/sdk.js"></script>
   <script src="plugins/jquery-3.4.1/jquery-3.4.1.min.js"></script>
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
+  
   <script src="plugins/bootstrap/popper.min.js"></script>
   <script src="plugins/bootstrap/bootstrap.min.js"></script>
   <script src="plugins/owl.carousel/owl.carousel.min.js"></script>

@@ -117,15 +117,7 @@ if (isset($_POST['submit_cart'])) {
               ?>
             </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="introduce.html">GIỚI THIỆU</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="blog.html">BLOG</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="Contact.html">LIÊN HỆ</a>
-          </li>
+          
         </ul>
       </div>
       <div id="offcanvas-flip1" uk-offcanvas="flip: true; overlay: true">

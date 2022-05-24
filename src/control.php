@@ -8,7 +8,8 @@ class Data
     if (mysqli_num_rows($result) != 0) {
       return false;
     }
-    $sql = "INSERT INTO users(ho,ten,gioitinh,ngaysinh,email,pass) VALUES ('$ho', '$ten', '$gioitinh', '$ngaysinh','$email', '$pass')";
+    $sql = "INSERT INTO users(ho,ten,gioitinh,ngaysinh,email,pass) 
+    VALUES ('$ho', '$ten', '$gioitinh', '$ngaysinh','$email', '$pass')";
     $result = mysqli_query($conn, $sql);
     return $result;
   }
